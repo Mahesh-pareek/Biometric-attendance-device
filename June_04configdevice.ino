@@ -108,8 +108,10 @@ void handleConfigureDevice() {
         <button onclick='confirmDelete()'>Delete All Stored Fingerprints</button>
       </div>
       <div class='home-button-container'>
-        <button onclick='goHome()'>Back to Home</button>
+        <a href='/Home' class='home-button-container'>Back to Home</a>
       </div>
+
+
       <script>
         function saveConfig() {
           const config = {
@@ -155,10 +157,6 @@ void handleConfigureDevice() {
               alert('Failed to delete stored fingerprints.');
             });
           }
-        }
-
-        function goHome() {
-          window.location.href = '/home';
         }
       </script>
     </body>
