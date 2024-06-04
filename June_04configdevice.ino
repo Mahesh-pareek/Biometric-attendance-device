@@ -58,7 +58,6 @@ String timeNow();
 void uploadToExcel(uint8_t fingid,String time);
 
 /*-----------------------------------------------------------------------*/
-
 void handleConfigureDevice() {
   String page = R"rawliteral(
     <!DOCTYPE html>
@@ -80,6 +79,9 @@ void handleConfigureDevice() {
         .delete-container { margin-top: 20px; text-align: center; }
         .delete-container button { padding: 10px 20px; background-color: #FF4136; color: white; border: none; border-radius: 5px; cursor: pointer; }
         .delete-container button:hover { background-color: #e3342f; }
+        .home-button-container { margin-top: 20px; text-align: center; }
+        .home-button-container button { padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .home-button-container button:hover { background-color: #0056b3; }
       </style>
     </head>
     <body>
@@ -104,6 +106,9 @@ void handleConfigureDevice() {
       </div>
       <div class='delete-container'>
         <button onclick='confirmDelete()'>Delete All Stored Fingerprints</button>
+      </div>
+      <div class='home-button-container'>
+        <button onclick='goHome()'>Back to Home</button>
       </div>
       <script>
         function saveConfig() {
@@ -150,6 +155,10 @@ void handleConfigureDevice() {
               alert('Failed to delete stored fingerprints.');
             });
           }
+        }
+
+        function goHome() {
+          window.location.href = '/home';
         }
       </script>
     </body>
@@ -201,7 +210,6 @@ void handleDeleteAllFingerprints() {
 void handleCheckDataSheet() {
   server.send(200, "text/html", "Check data sheet page");
 }
-
 //----------------------------------------------------------------------
 void handleRoot() {
   if (!server.authenticate(www_username,
@@ -295,57 +303,160 @@ void handleHome() {
 //----------------------------------------------------------------------
 
 void handleDeleteUser() {
-  String page =
-      "<!DOCTYPE html><html><head> <title>Delete User</title> <style> body { "
-      "font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; "
-      "padding: 20px; } h1 { text-align: center; color: #333; } .container { "
-      "max-width: 600px; margin: 0 auto; padding: 20px; background-color: "
-      "#fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); } "
-      "form { display: flex; flex-direction: column; align-items: center; } "
-      "label { margin-bottom: 8px; font-weight: bold; } input[type='number'] { "
-      "padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; "
-      "border-radius: 4px; font-size: 1em; width: 100%; max-width: 300px; } "
-      "button { padding: 10px 20px; background-color: #FF4136; color: white; "
-      "border: none; border-radius: 4px; cursor: pointer; font-size: 1em; } "
-      "button:hover { background-color: #e3342f; } .back-button { display: "
-      "block; margin-top: 20px; text-align: center; text-decoration: none; "
-      "color: #fff; background-color: #007BFF; padding: 10px 20px; "
-      "border-radius: 4px; } .back-button:hover { background-color: #0056b3; } "
-      "</style></head><body> <div class='container'> <h1>Delete User</h1> "
-      "<form action='/DeleteUser' method='POST'> <label for='id'>Employee "
-      "ID:</label> <input type='number' id='id' name='id' required> <button "
-      "type='submit'>Delete Fingerprint</button> </form> <a href='/Home' "
-      "class='back-button'>Back to Home</a> </div></body></html>";
+  String page = R"rawliteral(
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title>Delete User</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      label {
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+      input[type='number'] {
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1em;
+        width: 100%;
+        max-width: 300px;
+      }
+      button {
+        padding: 10px 20px;
+        background-color: #FF4136;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+      }
+      button:hover {
+        background-color: #e3342f;
+      }
+      .back-button {
+        display: block;
+        margin-top: 20px;
+        text-align: center;
+        text-decoration: none;
+        color: #fff;
+        background-color: #007BFF;
+        padding: 10px 20px;
+        border-radius: 4px;
+      }
+      .back-button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <h1>Delete User</h1>
+      <form action='/DeleteUser' method='POST'>
+        <label for='id'>Employee ID:</label>
+        <input type='number' id='id' name='id' required>
+        <button type='submit'>Delete Fingerprint</button>
+      </form>
+      <a href='/Home' class='back-button'>Back to Home</a>
+    </div>
+  </body>
+  </html>
+  )rawliteral";
+
   if (server.method() == HTTP_POST) {
     int id = server.arg("id").toInt();
     if (id > 0) {
-      String page2 =
-          "<!DOCTYPE html><html><head> <title>Deleting Fingerprint</title> "
-          "<style> body { font-family: Arial, sans-serif; background-color: "
-          "#f4f4f9; margin: 0; padding: 0; display: flex; justify-content: "
-          "center; align-items: center; height: 100vh; text-align: center; } "
-          ".container { background-color: #fff; padding: 20px 40px; "
-          "border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); } h1 "
-          "{ color: #333; font-size: 1.5em; margin-bottom: 20px; } p { color: "
-          "#666; font-size: 1.2em; margin-bottom: 20px; } a { display: "
-          "inline-block; padding: 10px 20px; background-color: #007BFF; color: "
-          "white; text-decoration: none; border-radius: 5px; transition: "
-          "background-color 0.3s; } a:hover { background-color: #0056b3; } "
-          "</style></head><body> <div class='container'> <h1>Deleting "
-          "Fingerprint...</h1> <p>Finger Deletion started. Check Display.</p> "
-          "<a href='/Home'>Click here to return to home</a> "
-          "</div></body></html>";
+      String page2 = R"rawliteral(
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Deleting Fingerprint</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f9;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          text-align: center;
+        }
+        .container {
+          background-color: #fff;
+          padding: 20px 40px;
+          border-radius: 10px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+          color: #333;
+          font-size: 1.5em;
+          margin-bottom: 20px;
+        }
+        p {
+          color: #666;
+          font-size: 1.2em;
+          margin-bottom: 20px;
+        }
+        a {
+          display: inline-block;
+          padding: 10px 20px;
+          background-color: #007BFF;
+          color: white;
+          text-decoration: none;
+          border-radius: 5px;
+          transition: background-color 0.3s;
+        }
+        a:hover {
+          background-color: #0056b3;
+        }
+      </style>
+    </head>
+    <body>
+      <div class='container'>
+        <h1>Deleting Fingerprint...</h1>
+        <p>Finger Deletion started. Check Display.</p>
+        <a href='/Home'>Click here to return to home</a>
+      </div>
+    </body>
+    </html>
+    )rawliteral";
+
       server.send(200, "text/html", page2);
       deleteFingerprint(id);
     } else {
       server.send(200, "text/html",
-                  "<html><body><h1>Failed to delete. Please try again.<a "
-                  "href='/Home'>Back to Home</a></h1></body></html>");
+                  "<html><body><h1>Failed to delete. Please try again.<a href='/Home'>Back to Home</a></h1></body></html>");
     }
   } else {
     server.send(200, "text/html", page);
   }
 }
+
 //----------------------------------------------------------------------
 
 void handleLogout() {
@@ -415,7 +526,7 @@ void handleLogout() {
 //------------------------------------------------------------------------
 
 void handleEnrollUser() {
-String page = R"rawliteral(
+String page = R"(
     <!DOCTYPE html>
     <html lang='en'>
     <head>
@@ -491,7 +602,7 @@ String page = R"rawliteral(
     <body>
         <div class='container'>
             <h1>Enroll New User</h1>
-            <p>Current number of fingerprints stored: """ + String(finger.templateCount) + """ / 127</p>
+            <p>Current number of fingerprints stored: )" + String(finger.templateCount) + "( / 127</p>
             <form action='/EnrollUser' method='POST'>
                 <label for='name'>Employee Name:</label>
                 <input type='text' id='name' name='name' required>
@@ -503,7 +614,7 @@ String page = R"rawliteral(
         </div>
     </body>
     </html>
-    )rawliteral";
+    )";
 
 
   if (server.method() == HTTP_POST) {
@@ -511,22 +622,63 @@ String page = R"rawliteral(
     String idStr = server.arg("id");
     int id = idStr.toInt();
     if (name.length() > 0 && id > 0 && id <= 127) {
-      String page2 =
-          "<!DOCTYPE html><html><head> <title>Scanning Fingerprint</title> "
-          "<style> body { font-family: Arial, sans-serif; background-color: "
-          "#f4f4f9; margin: 0; padding: 0; display: flex; justify-content: "
-          "center; align-items: center; height: 100vh; text-align: center; } "
-          ".container { background-color: #fff; padding: 20px 40px; "
-          "border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); } h1 "
-          "{ color: #333; font-size: 1.5em; margin-bottom: 20px; } p { color: "
-          "#666; font-size: 1.2em; margin-bottom: 20px; } a { display: "
-          "inline-block; padding: 10px 20px; background-color: #007BFF; color: "
-          "white; text-decoration: none; border-radius: 5px; transition: "
-          "background-color 0.3s; } a:hover { background-color: #0056b3; } "
-          "</style></head><body> <div class='container'> <h1>Scanning "
-          "Fingerprint...</h1> <p>Check display and follow instructions to "
-          "enroll new finger.</p> <a href='/Home'>Click here to return to "
-          "home</a> </div></body></html>";
+    String page2 = R"rawliteral(
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Scanning Fingerprint</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f9;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          text-align: center;
+        }
+        .container {
+          background-color: #fff;
+          padding: 20px 40px;
+          border-radius: 10px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+          color: #333;
+          font-size: 1.5em;
+          margin-bottom: 20px;
+        }
+        p {
+          color: #666;
+          font-size: 1.2em;
+          margin-bottom: 20px;
+        }
+        a {
+          display: inline-block;
+          padding: 10px 20px;
+          background-color: #007BFF;
+          color: white;
+          text-decoration: none;
+          border-radius: 5px;
+          transition: background-color 0.3s;
+        }
+        a:hover {
+          background-color: #0056b3;
+        }
+      </style>
+    </head>
+    <body>
+      <div class='container'>
+        <h1>Scanning Fingerprint...</h1>
+        <p>Check display and follow instructions to enroll new finger.</p>
+        <a href='/Home'>Click here to return to home</a>
+      </div>
+    </body>
+    </html>
+    )rawliteral";
+
       server.send(200, "text/html", page2);
       ID_ = id;
       getFingerprintEnroll();
