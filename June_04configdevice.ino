@@ -108,7 +108,7 @@ void handleConfigureDevice() {
         <button onclick='confirmDelete()'>Delete All Stored Fingerprints</button>
       </div>
       <div class='home-button-container'>
-        <a href='/Home' class='home-button-container'>Back to Home</a>
+        <button onclick='goHome()'>Back to Home</button>
       </div>
 
 
@@ -157,6 +157,10 @@ void handleConfigureDevice() {
               alert('Failed to delete stored fingerprints.');
             });
           }
+        }
+
+        function goHome() {
+          window.location.href = '/Home';
         }
       </script>
     </body>
@@ -517,7 +521,7 @@ void handleLogout() {
     </body>
     </html>
     )rawliteral";
-
+  server.sendHeader("Set-Cookie", "session=; Max-Age=0; path=/; HttpOnly");
   server.sendHeader("Connection", "close");
   server.send(200, "text/html", page);
 }
