@@ -2,7 +2,7 @@
 #include "RTClib.h"
 #include <Adafruit_Fingerprint.h>   // 33KB
 #include <Adafruit_LiquidCrystal.h> // 21KB
-#include <ESPmDNS.h> 
+// #include <ESPmDNS.h> 
 #include <HTTPClient.h> // 40KB
 #include <LiquidCrystal_I2C.h> // 12KB
 #include <Update.h>
@@ -50,8 +50,8 @@ const char* wwwpasspath ="/wwwpass.txt";
 
 */
 
-const char *ssid = "Realme";
-const char *password = "12345678";
+const char *ssid = "The Woodbury";
+const char *password = "thewoodbury2024";
 const char *wwwid = "admin";
 const char *wwwpass = "esp32";
 const char *www_realm = "Custom Auth Realm"; // set realm of auth to Default:"Login Required"
@@ -1182,18 +1182,21 @@ void setupWiFi() {
     Serial.println(WiFi.localIP());
     lcd.setCursor(0, 1);
     lcd.print("Connected!          ");
+    delay(500);
+    lcd.setCursor(0,1);
+    lcd.print(WiFi.localIP());
   }
 }
 //---------------------------------------------------------------------------
 
 void setupOTA() {
-  if (!MDNS.begin("configBAD")) {
-    Serial.println("Error:  Failed to setup MDNS responder!");
-    while (1) { // Lock the code in infinite loop (until the device restarts)
-      delay(1000);
-    }
-  }
-  Serial.println("-    mDNS responder started");
+  // if (!MDNS.begin("configBAD")) {
+  //   Serial.println("Error:  Failed to setup MDNS responder!");
+  //   while (1) { // Lock the code in infinite loop (until the device restarts)
+  //     delay(1000);
+  //   }
+  // }
+  // Serial.println("-    mDNS responder started");
 
   server.on("/", HTTP_GET, handleRoot);
   server.on("/Home", handleHome);
