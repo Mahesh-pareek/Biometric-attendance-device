@@ -2,19 +2,19 @@
 #include "FS.h"
 #include "SD.h"
 #include "SPI.h"
-#include <ArduinoJson.h> // large ig :(
+#include <ArduinoJson.h>  // large ig :(
 #include "RTClib.h"
-#include <Adafruit_Fingerprint.h>   // 33KB
-#include <Adafruit_LiquidCrystal.h> // 21KB
-#include <ESPmDNS.h> 
-#include <HTTPClient.h> // 40KB
-#include <LiquidCrystal_I2C.h> // 12KB
+#include <Adafruit_Fingerprint.h>    // 33KB
+#include <Adafruit_LiquidCrystal.h>  // 21KB
+#include <ESPmDNS.h>
+#include <HTTPClient.h>         // 40KB
+#include <LiquidCrystal_I2C.h>  // 12KB
 #include <Update.h>
-#include <WebServer.h> // 36 KB
+#include <WebServer.h>  // 36 KB
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <Arduino.h>
-#include <ESP_Google_Sheet_Client.h> // 140KB
+#include <ESP_Google_Sheet_Client.h>  // 140KB
 #include <time.h>
 
 
@@ -38,8 +38,8 @@ Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 RTC_DS1307 rtc;
 
-MasterList* employeeList;
-AttendanceSystem* OverallAttendance;
+MasterList *employeeList;
+AttendanceSystem *OverallAttendance;
 
 String CompanyName = "Company13";
 
@@ -64,7 +64,7 @@ const char *ssid = "Realme";
 const char *password = "12345678";
 const char *wwwid = "admin";
 const char *wwwpass = "esp32";
-const char *www_realm = "Custom Auth Realm"; // set realm of auth to Default:"Login Required"
+const char *www_realm = "Custom Auth Realm";  // set realm of auth to Default:"Login Required"
 String authFailResponse = "Authentication Failed";
 bool foundStation = false;
 
@@ -76,11 +76,11 @@ const char spreadsheetId[] = "1kjVsjo8GPZHqmcbIkiuYRqXgevBSdq4YZchCUihwx14";
 WebServer server(80);
 
 // uint8_t ID = finger.templateCount+1;
-uint8_t ID_; // letter we will scan this number from a file stored in the sd card
+uint8_t ID_;  // letter we will scan this number from a file stored in the sd card
 
 
 unsigned long lastUpTime = 0;
-unsigned long timerDelay = 300000; // change
+unsigned long timerDelay = 60000;  // change
 
 /*----Function Definitions----*/
 void setupWiFi();
@@ -97,7 +97,7 @@ void handleDeleteAllFingerprints();
 
 void handleEnrollUser();
 void handleDeleteUser();
-void handleCheckDataSheet();
+void handleCurrentWorkingEmployees();
 void handleLogout();
 
 void uploaddd(char *data);
@@ -110,86 +110,78 @@ String timeNow();
 
 /*-----------------------------------------------------------------------*/
 
-void initializeVar(){
+void initializeVar() {
   /*
   String ssid_;
   String password_;
   String wwwid_;
   String wwwpass_; // Read all from the file
   */
-
 }
 
 
 void tokenStatusCallback(TokenInfo info) {
-    if (info.status == token_status_error) {
-        GSheet.printf("Token info: type = %s, status = %s\n", GSheet.getTokenType(info).c_str(), GSheet.getTokenStatus(info).c_str());
-        GSheet.printf("Token error: %s\n", GSheet.getTokenError(info).c_str());
-    } else {
-        GSheet.printf("Token info: type = %s, status = %s\n", GSheet.getTokenType(info).c_str(), GSheet.getTokenStatus(info).c_str());
-    }
+  if (info.status == token_status_error) {
+    GSheet.printf("Token info: type = %s, status = %s\n", GSheet.getTokenType(info).c_str(), GSheet.getTokenStatus(info).c_str());
+    GSheet.printf("Token error: %s\n", GSheet.getTokenError(info).c_str());
+  } else {
+    GSheet.printf("Token info: type = %s, status = %s\n", GSheet.getTokenType(info).c_str(), GSheet.getTokenStatus(info).c_str());
+  }
 }
 
 
-void uploaddd(char *data){
-  char employeeID[6+1];
-  char name[20+1];
-  char inDate[10+1];
-  char inTime[5+1];
-  char outDate[10+1];
-  char outTime[5+1];
-  
-  for(int i = 0 ; i < SIZE_OF_DATA_ARRAY; i++){
-    if(i == SDA_ID || i == SDA_NAME || i == SDA_IND || i == SDA_INT || i == SDA_OUTD || i== SDA_OUTT ){//Location of ","
-      continue; //ignore
-    }
-    else if(i < SDA_ID){
+void uploaddd(char *data) {
+  char employeeID[6 + 1];
+  char name[20 + 1];
+  char inDate[10 + 1];
+  char inTime[5 + 1];
+  char outDate[10 + 1];
+  char outTime[5 + 1];
+
+  for (int i = 0; i < SIZE_OF_DATA_ARRAY; i++) {
+    if (i == SDA_ID || i == SDA_NAME || i == SDA_IND || i == SDA_INT || i == SDA_OUTD || i == SDA_OUTT) {  //Location of ","
+      continue;                                                                                            //ignore
+    } else if (i < SDA_ID) {
       employeeID[i] = data[i];
+    } else if (i < SDA_NAME) {
+      name[i - SDA_ID - 1] = data[i];
+    } else if (i < SDA_IND) {
+      inDate[i - SDA_NAME - 1] = data[i];
+    } else if (i < SDA_INT) {
+      inTime[i - SDA_IND - 1] = data[i];
+    } else if (i < SDA_OUTD) {
+      outDate[i - SDA_INT - 1] = data[i];
+    } else if (i < SDA_OUTT) {
+      outTime[i - SDA_OUTD - 1] = data[i];
     }
-    else if(i < SDA_NAME){
-      name[i-SDA_ID-1] = data[i];
-    }
-    else if(i < SDA_IND){
-      inDate[i-SDA_NAME-1] = data[i];
-    }
-    else if(i < SDA_INT){
-      inTime[i-SDA_IND-1] = data[i];
-    }
-    else if(i < SDA_OUTD){
-      outDate[i-SDA_INT-1] = data[i];
-    }
-    else if(i < SDA_OUTT){      
-      outTime[i-SDA_OUTD-1]= data[i];
-    }  
   }
-  employeeID[6] = '\0';     //null-terminate
+  employeeID[6] = '\0';  //null-terminate
   name[20] = '\0';
   inDate[10] = '\0';
   inTime[5] = '\0';
   outDate[10] = '\0';
-  outTime[5] = '\0';  
+  outTime[5] = '\0';
 
   FirebaseJson response;
   FirebaseJson jsonObj;
 
-  jsonObj.add("majorDimension","ROWS");
+  jsonObj.add("majorDimension", "ROWS");
   jsonObj.set("values/[0]/[0]", employeeID);
   jsonObj.set("values/[0]/[1]", name);
   jsonObj.set("values/[0]/[2]", inDate);
   jsonObj.set("values/[0]/[3]", inTime);
   jsonObj.set("values/[0]/[4]", outDate);
-  jsonObj.set("values/[0]/[5]", outTime);  
+  jsonObj.set("values/[0]/[5]", outTime);
 
   bool success = GSheet.values.append(&response, spreadsheetId, "EntriesLog!A1", &jsonObj);
   if (success) {
-      response.toString(Serial, true);
-      jsonObj.clear();
+    response.toString(Serial, true);
+    jsonObj.clear();
   } else {
-      Serial.println(GSheet.errorReason());
+    Serial.println(GSheet.errorReason());
   }
   Serial.println();
-  Serial.println(ESP.getFreeHeap()); // remove it later
-
+  Serial.println(ESP.getFreeHeap());  // remove it later
 }
 
 
@@ -354,9 +346,9 @@ void handleDeleteAllFingerprints() {
   finger.emptyDatabase();
   Serial.print("Deleted All Finger Prints");
   lcd.clear();
-  lcd.setCursor(0,1);
+  lcd.setCursor(0, 1);
   lcd.print("Successfully deleted");
-  lcd.setCursor(0,2);
+  lcd.setCursor(0, 2);
   lcd.print("All Fingerprints");
   server.send(200, "application/json", "{\"status\":\"success\",\"message\":\"All stored fingerprints deleted successfully\"}");
 }
@@ -400,16 +392,42 @@ void handleCheckDataSheet() {
       th {
         background-color: #f2f2f2;
       }
+      .back-button, .refresh-button {
+        display: inline-block;
+        margin-top: 20px;
+        text-align: center;
+        text-decoration: none;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 4px;
+        margin-right: 10px;
+      }
+      .back-button {
+        background-color: #007BFF;
+      }
+      .back-button:hover {
+        background-color: #0056b3;
+      }
+      .refresh-button {
+        background-color: #28a745;
+      }
+      .refresh-button:hover {
+        background-color: #218838;
+      }
     </style>
   </head>
   <body>
     <div class='container'>
-      <h1>Currently MarkedIn Employees </h1>
+      <h1>Currently MarkedIn Employees</h1>
       )rawliteral";
   
-  String data = OverallAttendance->returnCurrentIn(SD); // add String wala function here
-  pg += dataSheetMembers(data);  
+  String data = OverallAttendance->returnCurrentIn(SD);  // add String wala function here
+  pg += dataSheetMembers(data); 
   pg += R"rawliteral(
+      <div>
+        <a href='/Home' class='back-button'>Back to Home</a>
+        <a href='/CheckDataSheet' class='refresh-button'>Refresh List</a>
+      </div>
     </div>
   </body>
   </html>
@@ -420,13 +438,13 @@ void handleCheckDataSheet() {
 
 String dataSheetMembers(String data) {
   char employeeID[7];  // x characters + null terminator
-  char name[21];       
-  char inDate[11];     
-  char inTime[6];      
+  char name[21];
+  char inDate[11];
+  char inTime[6];
   int totalEntries = data.length() / 45;
   int count = 0;
   String pg = "<table border='1'><tr><th>Employee ID</th><th>Name</th><th>In Date</th><th>In Time</th></tr>";
-  
+
   for (int i = 0; i <= SDA_INT && count < totalEntries; i++) {
     if (i == SDA_INT) {
       employeeID[6] = '\0';  // null-terminate
@@ -454,11 +472,11 @@ String dataSheetMembers(String data) {
 }
 //----------------------------------------------------------------------
 void handleRoot() {
-  if (!server.authenticate(wwwid,wwwpass)) { // if authentication fails
+  if (!server.authenticate(wwwid, wwwpass)) {  // if authentication fails
     server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
-    return; // Exit function
+    return;  // Exit function
   }
-  server.sendHeader("Location", "/Home"); // Redirect to home page
+  server.sendHeader("Location", "/Home");  // Redirect to home page
   server.send(303);
 }
 //----------------------------------------------------------------------
@@ -533,7 +551,7 @@ void handleHome() {
           <a class='button' href='/ConfigureDevice'>Configure Device</a>
           <a class='button' href='/EnrollUser'>Enroll User</a>
           <a class='button' href='/DeleteUser'>Delete User</a>
-          <a class='button' href='/CheckDataSheet'>Check DataSheet</a>
+          <a class='button' href='/CurrentWorkingEmployees'>Current Working Employees</a>
           <a class='button logout' href='/Logout'>Logout</a>
       </div>
   </body>
@@ -543,13 +561,12 @@ void handleHome() {
 }
 //----------------------------------------------------------------------
 
-
 String getPageStr() {
   String page = "<table>";
   page += "<tr> <th> Fingerprint ID</th> <th> Employee Name </th> <th> Employee ID</th> </tr>";
   for (int i = 1; i <= FINGERPRINT_CAPACITY; i++) {
     if (employeeList->returnName(SD, i) == "")
-      continue; // if empty continue
+      continue;  // if empty continue
 
     page += "<tr> <td>" + String(i) + "</td> <td>" + employeeList->returnName(SD, i) + "</td> <td>" + employeeList->returnEmpID(SD, i) + "</td></tr>";
   }
@@ -671,8 +688,11 @@ void handleDeleteUser() {
         <button type='submit'>Delete Fingerprint</button>
       </form>
       <h2>Active Users</h2>
-      )rawliteral" + userList + R"rawliteral(
+      )rawliteral"
+                + userList
+                + R"rawliteral(
       <a href='/Home' class='back-button'>Back to Home</a>
+      <a href='/DeleteUser' class='refresh-button'>Refresh List</a>
     </div>
   </body>
   </html>
@@ -748,6 +768,7 @@ void handleDeleteUser() {
     server.send(200, "text/html", page);
   }
 }
+
 //----------------------------------------------------------------------
 
 void handleLogout() {
@@ -816,10 +837,10 @@ void handleLogout() {
 }
 //------------------------------------------------------------------------
 
- // getNextEmployeeId
-void handleEnrollUser() { 
+// getNextEmployeeId
+void handleEnrollUser() {
   uint8_t latestEmpID = OverallAttendance->getLatestID(SD);
-  
+
   String page = R"(
   <!DOCTYPE html>
   <html lang='en'>
@@ -903,11 +924,12 @@ void handleEnrollUser() {
       <div class='container'>
           <h1>Enroll New User</h1>
           <p>Current number of fingerprints stored: )"
-              + String(finger.templateCount) + R"( / 127</p>
+                + String(finger.templateCount) + R"( / 127</p>
           <form action='/EnrollUser' method='POST'>
               <label for='name'>Employee Name:</label>
               <input type='text' id='name' name='name' required>
-              <div class='enroll-info'>Enroll as TWB)"+ String(latestEmpID/100) + String((latestEmpID%100)/10) + String(latestEmpID%10) + R"(</div>
+              <div class='enroll-info'>Enroll as TWB)"
+                + String(latestEmpID / 100) + String((latestEmpID % 100) / 10) + String(latestEmpID % 10) + R"(</div>
               <button type='submit'>Scan Fingerprint</button>
           </form>
           <a href='/Home' class='back-button'>Back to Home</a>
@@ -981,14 +1003,14 @@ void handleEnrollUser() {
       server.send(200, "text/html", page2);
 
       uint8_t successCase = getFingerprintEnroll(latestEmpID);
-      if (successCase == 0) { 
+      if (successCase == 0) {
         Serial.println("SUCCESSSSSSSSSS");
         OverallAttendance->increaseID(SD);
-        String empIDStr = String(latestEmpID/100) + String((latestEmpID%100)/10) + String(latestEmpID%10);
+        String empIDStr = String(latestEmpID / 100) + String((latestEmpID % 100) / 10) + String(latestEmpID % 10);
 
-        employeeList->addName(SD, latestEmpID, "TWB"+empIDStr, name);
+        employeeList->addName(SD, latestEmpID, "TWB" + empIDStr, name);
       }
-      
+
     } else {
       server.send(200, "text/html",
                   "<html><body><h1>Failed to enroll. Please ensure all field "
@@ -1009,27 +1031,27 @@ uint8_t getFingerprintEnroll(uint8_t ID_) {
   lcd.setCursor(0, 0);
   lcd.print("Enrolling as #");
   lcd.print(ID_);
-  lcd.setCursor(0,1);
+  lcd.setCursor(0, 1);
   lcd.print("Place finger");
 
   while (p != FINGERPRINT_OK) {
     p = finger.getImage();
     switch (p) {
-    case FINGERPRINT_OK:
-      Serial.println("Image taken");
-      break;
-    case FINGERPRINT_NOFINGER:
-      Serial.print(".");
-      break;
-    case FINGERPRINT_PACKETRECIEVEERR:
-      Serial.println("Communication error");
-      break;
-    case FINGERPRINT_IMAGEFAIL:
-      Serial.println("Imaging error");
-      break;
-    default:
-      Serial.println("Unknown error");
-      break;
+      case FINGERPRINT_OK:
+        Serial.println("Image taken");
+        break;
+      case FINGERPRINT_NOFINGER:
+        Serial.print(".");
+        break;
+      case FINGERPRINT_PACKETRECIEVEERR:
+        Serial.println("Communication error");
+        break;
+      case FINGERPRINT_IMAGEFAIL:
+        Serial.println("Imaging error");
+        break;
+      default:
+        Serial.println("Unknown error");
+        break;
     }
   }
 
@@ -1037,24 +1059,24 @@ uint8_t getFingerprintEnroll(uint8_t ID_) {
 
   p = finger.image2Tz(1);
   switch (p) {
-  case FINGERPRINT_OK:
-    Serial.println("Image converted");
-    break;
-  case FINGERPRINT_IMAGEMESS:
-    Serial.println("Image too messy");
-    return p;
-  case FINGERPRINT_PACKETRECIEVEERR:
-    Serial.println("Communication error");
-    return p;
-  case FINGERPRINT_FEATUREFAIL:
-    Serial.println("Could not find fingerprint features");
-    return p;
-  case FINGERPRINT_INVALIDIMAGE:
-    Serial.println("Could not find fingerprint features");
-    return p;
-  default:
-    Serial.println("Unknown error");
-    return p;
+    case FINGERPRINT_OK:
+      Serial.println("Image converted");
+      break;
+    case FINGERPRINT_IMAGEMESS:
+      Serial.println("Image too messy");
+      return p;
+    case FINGERPRINT_PACKETRECIEVEERR:
+      Serial.println("Communication error");
+      return p;
+    case FINGERPRINT_FEATUREFAIL:
+      Serial.println("Could not find fingerprint features");
+      return p;
+    case FINGERPRINT_INVALIDIMAGE:
+      Serial.println("Could not find fingerprint features");
+      return p;
+    default:
+      Serial.println("Unknown error");
+      return p;
   }
 
   Serial.println("Remove finger");
@@ -1074,21 +1096,21 @@ uint8_t getFingerprintEnroll(uint8_t ID_) {
   while (p != FINGERPRINT_OK) {
     p = finger.getImage();
     switch (p) {
-    case FINGERPRINT_OK:
-      Serial.println("Image taken");
-      break;
-    case FINGERPRINT_NOFINGER:
-      Serial.print(".");
-      break;
-    case FINGERPRINT_PACKETRECIEVEERR:
-      Serial.println("Communication error");
-      break;
-    case FINGERPRINT_IMAGEFAIL:
-      Serial.println("Imaging error");
-      break;
-    default:
-      Serial.println("Unknown error");
-      break;
+      case FINGERPRINT_OK:
+        Serial.println("Image taken");
+        break;
+      case FINGERPRINT_NOFINGER:
+        Serial.print(".");
+        break;
+      case FINGERPRINT_PACKETRECIEVEERR:
+        Serial.println("Communication error");
+        break;
+      case FINGERPRINT_IMAGEFAIL:
+        Serial.println("Imaging error");
+        break;
+      default:
+        Serial.println("Unknown error");
+        break;
     }
   }
 
@@ -1096,39 +1118,39 @@ uint8_t getFingerprintEnroll(uint8_t ID_) {
 
   p = finger.image2Tz(2);
   switch (p) {
-  case FINGERPRINT_OK:
-    Serial.println("Image converted");
-    break;
-  case FINGERPRINT_IMAGEMESS:
-    Serial.println("Image too messy");
-    lcd.clear();
-    lcd.setCursor(0, 1);
-    lcd.print("ERROR Enrolling #" + String(ID_));
-    return p;
-  case FINGERPRINT_PACKETRECIEVEERR:
-    Serial.println("Communication error");
-    lcd.clear();
-    lcd.setCursor(0, 1);
-    lcd.print("ERROR Enrolling #" + String(ID_));
-    return p;
-  case FINGERPRINT_FEATUREFAIL:
-    Serial.println("Could not find fingerprint features");
-    lcd.clear();
-    lcd.setCursor(0, 1);
-    lcd.print("ERROR Enrolling #" + String(ID_));
-    return p;
-  case FINGERPRINT_INVALIDIMAGE:
-    Serial.println("Could not find fingerprint features");
-    lcd.clear();
-    lcd.setCursor(0, 1);
-    lcd.print("ERROR Enrolling #" + String(ID_));
-    return p;
-  default:
-    Serial.println("Unknown error");
-    lcd.clear();
-    lcd.setCursor(0, 1);
-    lcd.print("ERROR Enrolling #" + String(ID_));
-    return p;
+    case FINGERPRINT_OK:
+      Serial.println("Image converted");
+      break;
+    case FINGERPRINT_IMAGEMESS:
+      Serial.println("Image too messy");
+      lcd.clear();
+      lcd.setCursor(0, 1);
+      lcd.print("ERROR Enrolling #" + String(ID_));
+      return p;
+    case FINGERPRINT_PACKETRECIEVEERR:
+      Serial.println("Communication error");
+      lcd.clear();
+      lcd.setCursor(0, 1);
+      lcd.print("ERROR Enrolling #" + String(ID_));
+      return p;
+    case FINGERPRINT_FEATUREFAIL:
+      Serial.println("Could not find fingerprint features");
+      lcd.clear();
+      lcd.setCursor(0, 1);
+      lcd.print("ERROR Enrolling #" + String(ID_));
+      return p;
+    case FINGERPRINT_INVALIDIMAGE:
+      Serial.println("Could not find fingerprint features");
+      lcd.clear();
+      lcd.setCursor(0, 1);
+      lcd.print("ERROR Enrolling #" + String(ID_));
+      return p;
+    default:
+      Serial.println("Unknown error");
+      lcd.clear();
+      lcd.setCursor(0, 1);
+      lcd.print("ERROR Enrolling #" + String(ID_));
+      return p;
   }
 
   // OK converted!
@@ -1208,7 +1230,7 @@ uint8_t getFingerprintID() {
 
   if (finger.templateCount == 0) {
     Serial.print(
-        "Sensor doesn't contain any fingerprint data. Please run the'enroll'.");
+      "Sensor doesn't contain any fingerprint data. Please run the'enroll'.");
     lcd.clear();
     lcd.setCursor(0, 1);
     lcd.print("No Fingerprints Found!");
@@ -1217,44 +1239,44 @@ uint8_t getFingerprintID() {
   }
 
   switch (p) {
-  case FINGERPRINT_OK:
-    Serial.println("Image taken");
-    break;
-  case FINGERPRINT_NOFINGER:
-    Serial.println("No finger detected");
-    return p;
-  case FINGERPRINT_PACKETRECIEVEERR:
-    Serial.println("Communication error");
-    return p;
-  case FINGERPRINT_IMAGEFAIL:
-    Serial.println("Imaging error");
-    return p;
-  default:
-    Serial.println("Unknown error");
-    return p;
+    case FINGERPRINT_OK:
+      Serial.println("Image taken");
+      break;
+    case FINGERPRINT_NOFINGER:
+      Serial.println("No finger detected");
+      return p;
+    case FINGERPRINT_PACKETRECIEVEERR:
+      Serial.println("Communication error");
+      return p;
+    case FINGERPRINT_IMAGEFAIL:
+      Serial.println("Imaging error");
+      return p;
+    default:
+      Serial.println("Unknown error");
+      return p;
   }
 
   // OK success!
   p = finger.image2Tz();
   switch (p) {
-  case FINGERPRINT_OK:
-    Serial.println("Image converted");
-    break;
-  case FINGERPRINT_IMAGEMESS:
-    Serial.println("Image too messy");
-    return p;
-  case FINGERPRINT_PACKETRECIEVEERR:
-    Serial.println("Communication error");
-    return p;
-  case FINGERPRINT_FEATUREFAIL:
-    Serial.println("Could not find fingerprint features");
-    return p;
-  case FINGERPRINT_INVALIDIMAGE:
-    Serial.println("Could not find fingerprint features");
-    return p;
-  default:
-    Serial.println("Unknown error");
-    return p;
+    case FINGERPRINT_OK:
+      Serial.println("Image converted");
+      break;
+    case FINGERPRINT_IMAGEMESS:
+      Serial.println("Image too messy");
+      return p;
+    case FINGERPRINT_PACKETRECIEVEERR:
+      Serial.println("Communication error");
+      return p;
+    case FINGERPRINT_FEATUREFAIL:
+      Serial.println("Could not find fingerprint features");
+      return p;
+    case FINGERPRINT_INVALIDIMAGE:
+      Serial.println("Could not find fingerprint features");
+      return p;
+    default:
+      Serial.println("Unknown error");
+      return p;
   }
 
   // OK converted!
@@ -1273,7 +1295,7 @@ uint8_t getFingerprintID() {
   }
 
   // found a match!
-  TotalAttendance tempObject(SD, "TWB"+String(finger.fingerID/100)+String((finger.fingerID%100)/10)+String(finger.fingerID%10), CompanyName);
+  TotalAttendance tempObject(SD, "TWB" + String(finger.fingerID / 100) + String((finger.fingerID % 100) / 10) + String(finger.fingerID % 10), CompanyName);
   char dateMark[11] = "";
   char timeMark[6] = "";
 
@@ -1290,7 +1312,7 @@ uint8_t getFingerprintID() {
   lcd.print("Scanned ID #" + String(finger.fingerID));
   lcd.setCursor(1, 2);
   lcd.print("Attandance Marked!");
-  lcd.setCursor(1,3);
+  lcd.setCursor(1, 3);
   lcd.print(dateToday() + " " + timeNow());
   delay(3000);
   lcd.clear();
@@ -1365,7 +1387,7 @@ void setupWiFi() {
 void setupOTA() {
   if (!MDNS.begin("configBAD")) {
     Serial.println("Error:  Failed to setup MDNS responder!");
-    while (1) { // Lock the code in infinite loop (until the device restarts)
+    while (1) {  // Lock the code in infinite loop (until the device restarts)
       delay(1000);
     }
   }
@@ -1377,7 +1399,7 @@ void setupOTA() {
   server.on("/save-config", HTTP_POST, handleSaveConfig);
   server.on("/EnrollUser", handleEnrollUser);
   server.on("/DeleteUser", handleDeleteUser);
-  server.on("/CheckDataSheet", handleCheckDataSheet);
+  server.on("/CurrentWorkingEmployees", handleCurrentWorkingEmployees);
   server.on("/delete-fingerprints", HTTP_POST, handleDeleteAllFingerprints);
   server.on("/Logout", handleLogout);
 
@@ -1398,7 +1420,7 @@ void setupOTA() {
 //----------------------------------------------------------------------
 
 void initializeRTC() {
-  Wire.begin(21, 22); // SDA to GPIO 21 and SCL to GPIO 22
+  Wire.begin(21, 22);  // SDA to GPIO 21 and SCL to GPIO 22
 
   if (!rtc.begin()) {
     Serial.println("Couldn't find RTC");
@@ -1423,7 +1445,7 @@ String dateToday() {
   String year = String(now.year());
 
   if (day.length() < 2)
-    day = '0' + day; // always two digits
+    day = '0' + day;  // always two digits
   if (month.length() < 2)
     month = '0' + month;
 
@@ -1434,7 +1456,7 @@ String dateToday() {
 //----------------------------------------------------------------------
 String timeNow() {
   DateTime now = rtc.now();
-  String time = String(now.hour()/10) + String(now.hour()%10) + ":" + String(now.minute()/10) + String(now.minute()%10);
+  String time = String(now.hour() / 10) + String(now.hour() % 10) + ":" + String(now.minute() / 10) + String(now.minute() % 10);
   return time;
 }
 //----------------------------------------------------------------------
@@ -1453,7 +1475,7 @@ void setup() {
   setupOTA();
   initializeRTC();
   while (!Serial)
-    ; // For Yun/Leo/Micro/Zero/...
+    ;  // For Yun/Leo/Micro/Zero/...
   delay(100);
   Serial.println("\n\nAdafruit finger detect test");
   // set the data rate for the sensor serial port
@@ -1469,7 +1491,7 @@ void setup() {
       delay(1);
     }
   }
-    // Initialize NTP
+  // Initialize NTP
   configTime(0, 0, "pool.ntp.org", "time.nist.gov");
   Serial.print("Waiting for NTP time sync: ");
   time_t now = time(nullptr);
@@ -1491,15 +1513,14 @@ void setup() {
 
   //Starting SD Card Functions
 
-  if(!SD.begin()){
-        Serial.println("Card Mount Failed");
-        return;
+  if (!SD.begin()) {
+    Serial.println("Card Mount Failed");
+    return;
   }
   uint8_t cardType = SD.cardType();
 
   employeeList = new MasterList(SD, "/MasterEmployee.txt", CompanyName);
   OverallAttendance = new AttendanceSystem(SD, CompanyName);
-  
 }
 
 void loop() {
@@ -1516,15 +1537,14 @@ void loop() {
   }
 
 
-  if (WiFi.status() != WL_CONNECTED) { // if wifi disconnets, Start SoftAP
-      foundStation = false;
-      Serial.println("Starting SoftAP...");
-      WiFi.softAP(ssid, password);
-      Serial.print("SoftAP IP address: ");
-      Serial.println(WiFi.softAPIP());
-      lcd.setCursor(0, 1);
-      lcd.print("SoftAP Started!     ");
-      delay(1000);
+  if (WiFi.status() != WL_CONNECTED) {  // if wifi disconnets, Start SoftAP
+    foundStation = false;
+    Serial.println("Starting SoftAP...");
+    WiFi.softAP(ssid, password);
+    Serial.print("SoftAP IP address: ");
+    Serial.println(WiFi.softAPIP());
+    lcd.setCursor(0, 1);
+    lcd.print("SoftAP Started!     ");
+    delay(1000);
   }
-
 }
