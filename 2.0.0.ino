@@ -558,7 +558,7 @@ void handleHome() {
           <a class='button' href='/ConfigureDevice'>Configure Device</a>
           <a class='button' href='/EnrollUser'>Enroll User</a>
           <a class='button' href='/DeleteUser'>Delete User</a>
-          <a class='button' href='/CurrentWorkingEmployees'>Current Working Employees</a>
+          <a class='button' href='/CurrentWorkingEmployees'>Currently MarkedIn</a>
           <a class='button logout' href='/Logout'>Logout</a>
       </div>
   </body>
