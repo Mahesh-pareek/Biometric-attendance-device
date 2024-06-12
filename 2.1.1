@@ -1588,13 +1588,6 @@ void loop() {
 
   bool ready = GSheet.ready();
 
-  if (ready && millis() - lastUpTime > timerDelay) {
-    lastUpTime = millis();
-    char *data = "TWB004,Erichwith20letters..,2024-06-11,12:07,2024-06-11,16:16";
-    //provide Data
-    uploaddd(data);
-  }
-
 
   if (WiFi.status() != WL_CONNECTED) {  // if wifi disconnets, Start SoftAP
     foundStation = false;
