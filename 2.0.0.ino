@@ -419,6 +419,15 @@ void handleCurrentWorkingEmployees(){
       )rawliteral";
   
   String data = OverallAttendance->returnCurrentIn(SD);  // add String wala function here
+
+  int entries = data.length()/45;
+  for (int i = 0; i < entries; i++) {
+    int fingerID = (String(data[45*i + 3]) + String(data[45*i+4]) + String(data[45*i+5])).toInt();
+    String name = employeeList->returnName(SD, fingerID);
+    for (int j = 0; j < (20 < name.length() ? 20 : name.length()); j++) {
+      data[45*i + 7 + j] = name[j];
+    }
+  }
   pg += dataSheetMembers(data); 
   pg += R"rawliteral(
       <div>
