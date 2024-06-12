@@ -18,7 +18,6 @@
 #include <time.h>
 
 
-
 #define PROJECT_ID "biometric-attendance-device"
 #define CLIENT_EMAIL "bad-001@biometric-attendance-device.iam.gserviceaccount.com"
 
@@ -129,7 +128,6 @@ void tokenStatusCallback(TokenInfo info) {
   }
 }
 
-
 void uploaddd(char *data) {
   char employeeID[6 + 1];
   char name[20 + 1];
@@ -184,7 +182,6 @@ void uploaddd(char *data) {
   Serial.println(ESP.getFreeHeap());  // remove it later
 }
 
-
 // --------------------------------------------------------------------------
 void handleConfigureDevice() {
   String page = R"rawliteral(
@@ -232,7 +229,7 @@ void handleConfigureDevice() {
           <input type='password' id='login-password' name='login-password'>
         </div>
         <div class='form-group'>
-          <label for='google-url'>Google Sheets/Scripts URL:</label>
+          <label for='google-url'>Google Sheets URL:</label>
           <input type='text' id='google-url' name='google-url'>
         </div>
         <div class='buttons'>
@@ -354,7 +351,7 @@ void handleDeleteAllFingerprints() {
 }
 //---------------------------------------------------------------------------
 
-void handleCheckDataSheet() {
+void handleCurrentWorkingEmployees(){
   String pg = R"rawliteral(
   <!DOCTYPE html>
   <html>
@@ -470,6 +467,7 @@ String dataSheetMembers(String data) {
   pg += "</table>";
   return pg;
 }
+
 //----------------------------------------------------------------------
 void handleRoot() {
   if (!server.authenticate(wwwid, wwwpass)) {  // if authentication fails
@@ -1021,6 +1019,7 @@ void handleEnrollUser() {
     server.send(200, "text/html", page);
   }
 }
+
 //---------------------------------------------------------------------------
 uint8_t getFingerprintEnroll(uint8_t ID_) {
 
@@ -1527,6 +1526,7 @@ void loop() {
   getFingerprintID();
   server.handleClient();
   delay(10);
+
   bool ready = GSheet.ready();
 
   if (ready && millis() - lastUpTime > timerDelay) {
