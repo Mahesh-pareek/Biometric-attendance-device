@@ -423,7 +423,7 @@ void handleCurrentWorkingEmployees(){
   pg += R"rawliteral(
       <div>
         <a href='/Home' class='back-button'>Back to Home</a>
-        <a href='/CheckDataSheet' class='refresh-button'>Refresh List</a>
+        <a href='/CurrentWorkingEmployees' class='refresh-button'>Refresh List</a>
       </div>
     </div>
   </body>
@@ -690,7 +690,6 @@ void handleDeleteUser() {
                 + userList
                 + R"rawliteral(
       <a href='/Home' class='back-button'>Back to Home</a>
-      <a href='/DeleteUser' class='refresh-button'>Refresh List</a>
     </div>
   </body>
   </html>
