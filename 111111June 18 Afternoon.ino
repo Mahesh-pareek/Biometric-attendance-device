@@ -1538,11 +1538,14 @@ void checkWiFiConnection() {
 }
 
 void initializeNTPAndGSheet() {
+  if(ntpReadyToUpload){
+    return;
+  }
   configTime(0, 0, "pool.ntp.org", "time.nist.gov");
   Serial.print("Waiting for NTP time sync: ");
   time_t now = time(nullptr);
 
-  while (now < 8 * 3600 * 2) {
+  while (now < 60) { // try for 60 seconds then skip
     delay(500);
     Serial.print(".");
     now = time(nullptr);
@@ -1601,10 +1604,9 @@ void setup() {
     return;
   }
 
-  
-  initializeVar();
   employeeList = new MasterList(SD, "/MasterEmployee.txt", CompanyName);
   OverallAttendance = new AttendanceSystem(SD, CompanyName);
+  initializeVar();
   setupWiFi();
   setupOTA();
   initializeRTC();
@@ -1654,7 +1656,7 @@ void updateTime() {
   Serial.print("Waiting for NTP time sync: ");
   time_t now = time(nullptr);
 
-  while (now < 8 * 3600 * 2) {
+  while (now < 60) { // try for 60 sec then skip
     delay(500);
     Serial.print(".");
     now = time(nullptr);
@@ -1706,7 +1708,6 @@ void updateTime() {
 }
 
 void tryGetFinger() {
-  scannerReady();
   getFingerprintID();
   if (tryNum == MAX_FINGER_TRY) {
     lcd.clear();
