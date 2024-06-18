@@ -28,7 +28,7 @@
 #define SDA_INT 44
 #define SDA_OUTD 55
 #define SDA_OUTT 61
-#define MAX_FINGER_TRY 3;
+#define MAX_FINGER_TRY 3
 
 #define mySerial Serial2
 #define FINGERPRINT_CAPACITY 127
@@ -41,7 +41,7 @@ RTC_DS1307 rtc;
 MasterList *employeeList;
 AttendanceSystem *OverallAttendance;
 
-String CompanyName = "Company18";
+
 
 /*---KeyWords and Parameters*/
 // Two Tabs "-   " Operation successful
@@ -52,27 +52,29 @@ String password_;
 String wwwid_;
 String wwwpass_;
 String gsheetUrl_;
+int companyid_;
 
 String ssidPath = "/ssid.txt";
 String passwordPath = "/password.txt";
 String wwwidPath = "/wwwid.txt";
 String wwwpassPath = "/wwwpass.txt";
 String gsheetUrlPath = "/gsheetUrl.txt";
+String companyidPath = "/companyid.txt";
 
 const String DEFAULT_SSID = "ioT_weB";
 const String DEFAULT_PASSWORD = "12341234";
 const String DEFAULT_WWWID = "admin";
 const String DEFAULT_WWWPASS = "esp32";
 const String DEFAULT_GSHEETURL = "1kjVsjo8GPZHqmcbIkiuYRqXgevBSdq4YZchCUihwx14";
+const int DEFAULT_COMPANYID = 20;
+
+String CompanyName = "Company" + String(DEFAULT_COMPANYID);
 
 const char *www_realm = "Custom Auth Realm";  // set realm of auth to Default:"Login Required"
 String authFailResponse = "Authentication Failed";
 bool foundStation = false;
-bool softAPOn = false;
 bool ntpReadyToUpload = false;
-
-
-
+bool softAPOn = false;
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDvgnF1lbw8R1MX\nynR/DKbFnsc0tlPei/3J4bWiYoerg5EG7+1Z5Um3APF6QNh1USoMiP7kerCLkaOs\npnF2XAbdTg9BGT0M8uuhIHJkl53VaLzEPuw2onAk1xGsbNr+Dbk8TSW697cLfJ+G\ng3i1Yzj1UUOzxzXaKjDXWDe6Th7ONLxBY+9wR1b7gzLKrJs03X+4sbY/vDA3WljL\nDlULNKIkkcE3GxtHLE1hliXcFp69YtZeIEBpBUnMwBvU8WXJuN594nBnJW/DWsSO\nk5yG4aVIU/v7oZM3Hb1IVthUZS8fYazmj6yX4nJbxid3RlzW66tvVyEYuVaUVUee\nEb7vWZRLAgMBAAECggEAMFMKX2Ypx6PAcTFpFeVQlNj3anxLKcDnIN+IjU4B/6oZ\nDeRE6HlpySHIlxkUU39f042kmCblDhQBiSlABViGDgrc6w6TkdRFlIn+aqtorhFm\n3NWxRUi7BcPbDgYcnVvZfwA116Z5aTjo2vQV28s8R8rwtQpBpFYU6q4i+FUgxAvd\n7apCZP69UwjfcaTZgaMf1u/Lf7H4SF5eML5FnV7EROUz3cygKDj0QGX6b1b0dTmr\ngPuIkmutgvSs6Kn9jt3B9RElBYGZCLJD3FUR+75YoL6f4hjtFuFk23ym1X+X9fKl\nkK5X9bhx9GXhiCLWAon9P6J+hKqUoIYHpg6SsVsvSQKBgQD67IFEX09jF2vp9azw\n4JMuJlqYoOOky5iV+Mj6vU5lzFMfXND0Ix9XwV+EWEBSK2i/7zRHoNnT7T2cVeET\nPXOWZXcbofy1/TaXnzmyWqJ3DuY9cYcdyZ1YqAxEX0BPoRAl3bJIJ0xog+teNVC9\nucMB/FZZK03kaW4yyBRjRhIlpQKBgQD0WtNLicEZW3tFTGghTsKr+4z8mhL+Vihb\n+lF3HoR+NvSQkGHZwtJO6ITyOLZDCqCSP5/CYXCO7qpJLzRxvXB/PJUIA4GeBm5G\njmqAFR/URmocnbgMEsA6jwgRxtN+QYj3FcyYOiMpSYWGcfwplxbksuCZ8Z50VXt+\nTwGLcZAPLwKBgQDI5sM48vak6APG9qTY13X/5UV0Hp0lPL2WlfKUjy1N5CJJYg8K\n6XQW1wSa+e3F3GuqAONi1i6Rt8k0eq4SsYjySZrrzO6A55PmId4YJukdWhiN6W+9\nMceBTEtGEt1y5AoBx1cO3igXJkg0zYsv3KN924NnMXzT/HX2wqtQMLIm4QKBgQDy\nChVJuYXALFGKbwimFXHXETCx9Zviukz37pdLOrtamezeVWXXYZcX+lHV7D79YUV0\nF/mTfRkVO2sJWuzDzTXlkoi8i1yUvyH0WZU8kbAZgDYTalan/trSJmOD2EIdyaR1\nuu4Ry2SQvPa6GaYBPFu85UJ8ukyORy4wCuooybA8mQKBgQDiAyv3f9VDppgI12LX\nJol//+3tzL56xCKnwGBPWJpbqUKEcFR+dwAfxmoN73eD655tjSE9WXAHISyCHIkJ\npnqMRXJ2w2Wl5bbC7Fta5Nh8xWiWY5UdOcGWzfKzId+P/ucJmzKc0ZIuBgCA1fNc\nxZ5uT3w9cMunPd0qJG214xM4Dg==\n-----END PRIVATE KEY-----\n";
 
 
@@ -80,7 +82,7 @@ WebServer server(80);
 
 uint8_t tryNum = 0;
 unsigned long lastUpTime = 0;
-unsigned long timerDelay = 60000;  // change ?????
+unsigned long timerDelay = 60000;  // change
 unsigned long softapstartmilli = 0;
 const unsigned long reconnectTimer = 30000;  // change
 
@@ -111,38 +113,45 @@ String timeNow();
 
 
 /*-----------------------------------------------------------------------*/
-
 void initializeVar() {
 
-  genfile ssidf(ssidPath, CompanyName);
+
+  genfile ssidf(ssidPath, "Settings");
+  ssidf.createDir(SD, "/TestCompany/Settings");
   if (!ssidf.checkFile(SD)) {
     ssidf.writeFile(SD, DEFAULT_SSID);
   }
   ssid_ = ssidf.readFile(SD);
 
-  genfile passwordf(passwordPath, CompanyName);
+  genfile passwordf(passwordPath, "Settings");
   if (!passwordf.checkFile(SD)) {
     passwordf.writeFile(SD, DEFAULT_PASSWORD);
   }
   password_ = passwordf.readFile(SD);
 
-  genfile wwwidf(wwwidPath, CompanyName);
+  genfile wwwidf(wwwidPath, "Settings");
   if (!wwwidf.checkFile(SD)) {
     wwwidf.writeFile(SD, DEFAULT_WWWID);
   }
   wwwid_ = wwwidf.readFile(SD);
 
-  genfile wwwpassf(wwwpassPath, CompanyName);
+  genfile wwwpassf(wwwpassPath, "Settings");
   if (!wwwpassf.checkFile(SD)) {
     wwwpassf.writeFile(SD, DEFAULT_WWWPASS);
   }
   wwwpass_ = wwwpassf.readFile(SD);
 
-  genfile gsheetUrlf(gsheetUrlPath, CompanyName);
+  genfile gsheetUrlf(gsheetUrlPath, "Settings");
   if (!gsheetUrlf.checkFile(SD)) {
     gsheetUrlf.writeFile(SD, DEFAULT_GSHEETURL);
   }
   gsheetUrl_ = gsheetUrlf.readFile(SD);
+
+  genfile companyid(companyidPath, "Settings");
+  if (!companyid.checkFile(SD)) {
+    companyid.writeFile(SD, String(DEFAULT_COMPANYID));
+  }
+  companyid_ = companyid.readFile(SD).toInt();
 }
 
 void tokenStatusCallback(TokenInfo info) {
@@ -399,31 +408,31 @@ void handleSaveConfig() {
     String googleUrl = jsonDoc["googleUrl"];
 
     if (!ssid.isEmpty()) {
-      genfile ssidf(SD, ssidPath, CompanyName);
+      genfile ssidf(SD, ssidPath, "Settings");
       ssidf.writeFile(SD, ssid);
       ssid_ = ssid;
     }
 
     if (!password.isEmpty()) {
-      genfile passwordf(SD, passwordPath, CompanyName);
+      genfile passwordf(SD, passwordPath, "Settings");
       passwordf.writeFile(SD, password);
       password_ = password;
     }
 
     if (!wwwid.isEmpty()) {
-      genfile wwwidf(SD, wwwidPath, CompanyName);
+      genfile wwwidf(SD, wwwidPath, "Settings");
       wwwidf.writeFile(SD, wwwid);
       wwwid_ = wwwid;
     }
 
     if (!wwwpass.isEmpty()) {
-      genfile wwwpassf(SD, wwwpassPath, CompanyName);
+      genfile wwwpassf(SD, wwwpassPath, "Settings");
       wwwpassf.writeFile(SD, wwwpass);
       wwwpass_ = wwwpass;
     }
 
     if (!googleUrl.isEmpty()) {
-      genfile gsheetUrlf(SD, gsheetUrlPath, CompanyName);
+      genfile gsheetUrlf(SD, gsheetUrlPath, "Settings");
       gsheetUrlf.writeFile(SD, googleUrl);
       gsheetUrl_ = googleUrl;
     }
@@ -443,6 +452,13 @@ void handleSaveConfig() {
 }
 void handleDeleteAllFingerprints() {
   finger.emptyDatabase();
+  genfile companyid(companyidPath, "Settings");
+  int temp = companyid.readFile(SD).toInt();
+
+  temp = temp + 1;
+
+  companyid.writeFile(SD, String(temp));
+
   Serial.print("Deleted All Finger Prints");
   lcd.clear();
   lcd.setCursor(0, 1);
@@ -450,6 +466,8 @@ void handleDeleteAllFingerprints() {
   lcd.setCursor(0, 2);
   lcd.print("All Fingerprints");
   server.send(200, "application/json", "{\"status\":\"success\",\"message\":\"All stored fingerprints deleted successfully\"}");
+
+  ESP.restart();
 }
 
 //-------------------------------------------------------------------------
@@ -1378,7 +1396,7 @@ uint8_t getFingerprintID() {
 
   dateToday().toCharArray(dateMark, sizeof(dateMark));
   timeNow().toCharArray(timeMark, sizeof(timeMark));
-  tempObject.newMarked(SD, dateMark, timeMark);  // update in lcd text whether it's in attendane or out
+  bool inorout = tempObject.newMarked(SD, dateMark, timeMark);  // update in lcd text whether it's in attendane or out
 
 
   Serial.print("Found ID #");
@@ -1389,7 +1407,12 @@ uint8_t getFingerprintID() {
   lcd.setCursor(1, 1);
   lcd.print("Scanned ID #" + String(finger.fingerID));
   lcd.setCursor(1, 2);
-  lcd.print("Attandance Marked!");
+  if (inorout) {
+    lcd.print("IN Marked!");
+  } else {
+    lcd.print("OUT Marked!");
+  }
+
   lcd.setCursor(1, 3);
   lcd.print(dateToday() + " " + timeNow());
   updateAttendance(finger.fingerID);
