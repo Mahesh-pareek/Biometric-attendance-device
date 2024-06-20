@@ -175,7 +175,13 @@ void loop() {
 
     bool success = GSheet.create(&response /* returned response */, &spreadsheet /* spreadsheet object */, USER_EMAIL /* your email that this spreadsheet shared to */);
     if (success) {
-      string sheetId = response.get("spreadsheetId").stringValue();
+
+      // Get the spreadsheet id from already created file.
+      FirebaseJsonData result;
+      response.get(result, FPSTR("spreadsheetId"));  // parse or deserialize the JSON response
+      if (result.success)
+        sheetId = result.to<const char *>();
+      result.clear();
       FirebaseJson valueRange;
 
       valueRange.add("range", "EntriesLog!A1:G1");
