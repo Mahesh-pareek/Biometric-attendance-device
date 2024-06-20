@@ -1,0 +1,89 @@
+/*
+  HTTP Advanced Authentication example
+  Created Mar 16, 2017 by Ahmed El-Sharnoby.
+  This example code is in the public domain.
+*/
+
+#include <WiFi.h>
+#include <ESPmDNS.h>
+#include <ArduinoOTA.h>
+#include <WebServer.h>
+
+const char* ssid = "Realme";
+const char* password = "12341234";
+
+WebServer server(80);
+
+const char* wwwid = "admin";
+const char* wwwpass = "esp32";
+// allows you to set the realm of authentication Default:"Login Required"
+const char* www_realm = "Custom Auth Realm";
+// the Content of the HTML response in case of Unautherized Access Default:empty
+String authFailResponse = "Authentication Failed";
+// Function to check authentication
+
+
+
+bool isAuthenticated() {
+  return server.authenticate(wwwid, wwwpass);
+}
+
+
+
+// Handle root
+void handleRoot() {
+  if (!isAuthenticated()) {
+    server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
+    return;  // Exit function
+  }
+  server.sendHeader("Location", "/Home");  // Redirect to home page
+  server.send(303);
+}
+
+// Handle home
+void handleHome() {
+  if (!isAuthenticated()) {
+    server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
+    return;  // Exit function
+  }
+  // Your home page logic here
+  server.send(200, "text/plain", "Welcome to the Home page!");
+}
+void handleEnrollUser() {
+  if (!isAuthenticated()) {
+    server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
+    return;  // Exit function
+  }
+  // Your enroll user logic here
+  String page = "<html><head><a href='/Home'>Go Home</a></head></html>";
+
+  server.send(200, "text/html", page);
+}
+
+
+void setup() {
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    Serial.println("WiFi Connect Failed! Rebooting...");
+    delay(1000);
+    ESP.restart();
+  }
+  ArduinoOTA.begin();
+
+  server.on("/", HTTP_GET, handleRoot);
+  server.on("/Home", HTTP_GET, handleHome);
+  server.on("/EnrollUser", HTTP_GET, handleEnrollUser);
+  server.begin();
+
+  Serial.print("Open http://");
+  Serial.print(WiFi.localIP());
+  Serial.println("/ in your browser to see it working");
+}
+
+void loop() {
+  ArduinoOTA.handle();
+  server.handleClient();
+  delay(2);  //allow the cpu to switch to other tasks
+}
