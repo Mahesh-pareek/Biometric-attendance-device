@@ -302,190 +302,6 @@ void uploaddd(char *data) {
 }
 
 //-------------------------------------------------------------------------
-// void handleConfigureDevice() {
-//   if (!isAuthenticated()) {
-//     server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
-//     return;  // Exit function
-//   }
-//   String page = R"rawliteral(
-//     <!DOCTYPE html>
-//     <html lang='en'>
-//     <head>
-//       <meta charset='UTF-8'>
-//       <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-//       <title>Config Settings</title>
-//       <style>
-//         body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
-//         .container { width: 80%; max-width: 800px; margin: 20px auto; border: 1px solid #ccc; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-//         .form-group { margin-bottom: 15px; }
-//         .form-group label { display: block; margin-bottom: 5px; }
-//         .form-group input { width: 100%; padding: 8px; box-sizing: border-box; }
-//         .buttons { display: flex; justify-content: space-between; flex-wrap: wrap; }
-//         .buttons button { padding: 10px 20px; border: none; cursor: pointer; margin: 5px; }
-//         .buttons button.save { background-color: #4CAF50; color: white; }
-//         .buttons button.reset { background-color: #f44336; color: white; }
-//         .delete-container, .home-button-container, .help-container { margin-top: 20px; text-align: center; }
-//         .delete-container button, .home-button-container button, .help-container button { padding: 10px 20px; background-color: #FF4136; color: white; border: none; border-radius: 5px; cursor: pointer; }
-//         .home-button-container button { background-color: #007BFF; }
-//         .help-container button { background-color: #17A2B8; }
-//         .popup { display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 5px; }
-//         .popup h3 { margin-top: 0; }
-//         .popup button { background-color: #007BFF; }
-//         .popup .close { background-color: #FF4136; }
-//         .message { display: none; background: #4CAF50; color: white; padding: 10px; margin-top: 20px; border-radius: 5px; text-align: center; }
-//       </style>
-//     </head>
-//     <body>
-//       <div class='container'>
-//         <h2>Config Settings</h2>
-//         <div class='form-group'>
-//           <label for='wifi-ssid'>WiFi SSID:</label>
-//           <input type='text' id='wifi-ssid' name='wifi-ssid'>
-//         </div>
-//         <div class='form-group'>
-//           <label for='wifi-password'>WiFi Password:</label>
-//           <input type='password' id='wifi-password' name='wifi-password'>
-//         </div>
-//         <div class='form-group'>
-//           <label for='login-id'>Login ID:</label>
-//           <input type='text' id='login-id' name='login-id'>
-//         </div>
-//         <div class='form-group'>
-//           <label for='login-password'>Login Password:</label>
-//           <input type='password' id='login-password' name='login-password'>
-//         </div>
-//         <div class='form-group'>
-//           <label for='gmail-id'>Gmail ID:</label>
-//           <input type='text' id='gmail-id' name='gmail-id'>
-//         </div>
-//         <div class='buttons'>
-//           <button class='save' onclick='saveConfig()'>Save</button>
-//           <button class='reset' type='reset' onclick='resetConfig()'>Reset</button>
-//           <button onclick='confirmCreateNewSheet()'>Generate New Spreadsheet</button>
-//           <button onclick='showHelp()'>Help Setting Up GSheet</button>
-//         </div>
-//       </div>
-//       <div class='delete-container'>
-//         <button onclick='confirmDelete()'>Delete All Stored Fingerprints</button>
-//       </div>
-//       <div class='home-button-container'>
-//         <button onclick='goHome()'>Back to Home</button>
-//       </div>
-
-//       <div class='popup' id='help-popup'>
-//         <h3>Help Setting Up GSheet</h3>
-//         <ol>
-//           <li><button onclick='copyCode()'>Copy this code</button></li>
-//           <li>Open Google Sheet -> Extensions -> App Scripts</li>
-//           <li>Paste the code in App Scripts and save</li>
-//           <li>Go to Extensions -> Macros -> Import Macros</li>
-//         </ol>
-//         <button class='close' onclick='closeHelp()'>Close</button>
-//       </div>
-
-//       <div class='message' id='success-message'></div>
-
-//       <script>
-//         function saveConfig() {
-//           const config = {
-//             wifiSsid: document.getElementById('wifi-ssid').value,
-//             wifiPassword: document.getElementById('wifi-password').value,
-//             loginId: document.getElementById('login-id').value,
-//             loginPassword: document.getElementById('login-password').value,
-//             gmailId: document.getElementById('gmail-id').value,
-//           };
-
-//           fetch('/save-config', {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify(config),
-//           })
-//           .then(response => response.json())
-//           .then(data => {
-//             console.log('Success:', data);
-//             alert('Configuration saved successfully!');
-//           })
-//           .catch((error) => {
-//             console.error('Error:', error);
-//             alert('Failed to save configuration.');
-//           });
-//         }
-
-//         function resetConfig() {
-//           document.getElementById('wifi-ssid').value = '';
-//           document.getElementById('wifi-password').value = '';
-//           document.getElementById('login-id').value = '';
-//           document.getElementById('login-password').value = '';
-//           document.getElementById('gmail-id').value = '';
-//         }
-
-//         function confirmDelete() {
-//           if (confirm('Are you sure you want to delete all stored fingerprints? This action is irreversible.')) {
-//             fetch('/delete-all-fingerprints', {
-//               method: 'POST'
-//             })
-//             .then(response => response.json())
-//             .then(data => {
-//               console.log('Success:', data);
-//               alert('All stored fingerprints deleted successfully!');
-//             })
-//             .catch((error) => {
-//               console.error('Error:', error);
-//               alert('Failed to delete stored fingerprints.');
-//             });
-//           }
-//         }
-
-//         function goHome() {
-//           window.location.href = '/Home';
-//         }
-
-//         function confirmCreateNewSheet() {
-//           if (confirm('Are you sure you want to create a new spreadsheet?')) {
-//             createNewSheet();
-//           }
-//         }
-
-//         function createNewSheet() {
-//           fetch('/create-new-sheet', {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify({ gmailId: userMail_ })
-//           })
-//           .then(response => response.json())
-//           .then(data => {
-//             console.log('Success:', data);
-//             document.getElementById('success-message').textContent = `Successfully created new sheet and sent it to ${userMail_}`;
-//             document.getElementById('success-message').style.display = 'block';
-//           })
-//           .catch((error) => {
-//             console.error('Error:', error);
-//             alert('Failed to create new spreadsheet.');
-//           });
-//         }
-
-//         function showHelp() {
-//           document.getElementById('help-popup').style.display = 'block';
-//         }
-
-//         function closeHelp() {
-//           document.getElementById('help-popup').style.display = 'none';
-//         }
-
-//         function copyCode() {
-//           navigator.clipboard.writeText('Your code here').then(() => {
-//             alert('Code copied to clipboard!');
-//           }, () => {
-//             alert('Failed to copy code.');
-//           });
-//         }
-//       </script>
-//     </body>
-//     </html>
-//   )rawliteral";
-//   server.send(200, "text/html", page);
-// }
-
 void handleConfigureDevice() {
   if (!isAuthenticated()) {
     server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
@@ -805,7 +621,6 @@ void handleSaveConfig() {
     server.send(405, "application/json", "{\"status\":\"error\",\"message\":\"Method not allowed\"}");
   }
 }
-
 void handleDeleteAllFingerprints() {
   finger.emptyDatabase();
   genfile companyid(companyidPath, "Settings");
@@ -936,130 +751,6 @@ void handleRoot() {
 }
 //-------------------------------------------------------------------------
 
-// void handleHome() {
-//   if (!isAuthenticated()) {
-//     server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
-//     return;  // Exit function
-//   }
-
-//   String page = R"rawliteral(
-//   <!DOCTYPE html>
-//   <html lang='en'>
-//   <head>
-//       <meta charset='UTF-8'>
-//       <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-//       <title>Home</title>
-//       <style>
-//           body {
-//               font-family: Arial, sans-serif;
-//               background-color: #f4f4f9;
-//               margin: 0;
-//               padding: 0;
-//               display: flex;
-//               flex-direction: column;
-//               align-items: center;
-//               height: 100vh;
-//               text-align: center;
-//           }
-//           h1 {
-//               margin-bottom: 20px;
-//               font-size: 24px;
-//               color: #333;
-//           }
-//           .button {
-//               display: inline-block;
-//               width: 150px;
-//               height: 40px;
-//               margin: 10px 5px;
-//               font-size: 16px;
-//               text-align: center;
-//               line-height: 40px;
-//               background-color: #4CAF50;
-//               color: white;
-//               text-decoration: none;
-//               border-radius: 10px;
-//               transition: background-color 0.3s;
-//           }
-//           .button:hover, .button:focus {
-//               background-color: #45a049;
-//           }
-//           .logout {
-//               background-color: #f44336;
-//           }
-//           .logout:hover, .logout:focus {
-//               background-color: #e3342f;
-//           }
-//           .container {
-//               padding: 20px;
-//               max-width: 800px;
-//               width: 100%;
-//           }
-//           @media (max-width: 600px) {
-//               .button {
-//                   width: 120px;
-//                   font-size: 14px;
-//               }
-//           }
-//           table {
-//               width: 100%;
-//               border-collapse: collapse;
-//               margin-top: 20px;
-//               font-size: 14px;
-//           }
-//           th, td {
-//               padding: 8px;
-//               border: 1px solid #ddd;
-//               text-align: left;
-//           }
-//           th {
-//               background-color: #f2f2f2;
-//           }
-//           .refresh-button {
-//               display: inline-block;
-//               margin-top: 20px;
-//               text-align: center;
-//               text-decoration: none;
-//               color: #fff;
-//               padding: 10px 20px;
-//               border-radius: 4px;
-//               background-color: #28a745;
-//           }
-//           .refresh-button:hover {
-//               background-color: #218838;
-//           }
-//       </style>
-//   </head>
-//   <body>
-//       <h1>Biometric Attendance Device</h1>
-//       <div class='container'>
-//           <a class='button' href='/ConfigureDevice'>Configure Device</a>
-//           <a class='button' href='/EnrollUser'>Enroll User</a>
-//           <a class='button' href='/DeleteUser'>Delete User</a>
-//           <a class='button logout' href='/Logout'>Logout</a>
-//           <h2>Currently MarkedIn Employees</h2>
-//   )rawliteral";
-
-//   // Fetch and display the currently marked-in employees
-//   String data = OverallAttendance->returnCurrentIn(SD);
-//   int entries = data.length() / 45;
-//   for (int i = 0; i < entries; i++) {
-//     int fingerID = (String(data[45 * i + 3]) + String(data[45 * i + 4]) + String(data[45 * i + 5])).toInt();
-//     String name = employeeList->returnName(SD, fingerID);
-//     for (int j = 0; j < (20 < name.length() ? 20 : name.length()); j++) {
-//       data[45 * i + 7 + j] = name[j];
-//     }
-//   }
-//   page += dataSheetMembers(data);
-//   page += R"rawliteral(
-//           <a href='/Home' class='refresh-button'>Refresh</a>
-//       </div>
-//   </body>
-//   </html>
-//   )rawliteral";
-
-//   server.send(200, "text/html", page);
-// }
-
 String dataSheetMembers(String data) {
   char employeeID[7];  // x characters + null terminator
   char name[21];
@@ -1067,7 +758,7 @@ String dataSheetMembers(String data) {
   char inTime[6];
   int totalEntries = data.length() / 45;
   int count = 0;
-  String pg = "<table><tr><th>Employee ID</th><th>Name</th><th>In Date</th><th>In Time</th></tr>";
+  String pg = "<table><tr><th>Employee ID</th><th>Name</th><th>In Date</th><th>In Time</th><th>Action</th></tr>";
 
   for (int i = 0; i <= SDA_INT && count < totalEntries; i++) {
     if (i == SDA_INT) {
@@ -1075,7 +766,8 @@ String dataSheetMembers(String data) {
       name[20] = '\0';
       inDate[10] = '\0';
       inTime[5] = '\0';
-      pg += "<tr><td>" + String(employeeID) + "</td><td>" + String(name) + "</td><td>" + String(inDate) + "</td><td>" + String(inTime) + "</td></tr>";
+      pg += "<tr><td>" + String(employeeID) + "</td><td>" + String(name) + "</td><td>" + String(inDate) + "</td><td>" + String(inTime) + "</td>";
+      pg += "<td><button onclick=\"showOptions('" + String(employeeID) + "')\">Mark Out</button></td></tr>";
       i = -1;
       count++;
       continue;
@@ -1094,7 +786,6 @@ String dataSheetMembers(String data) {
   pg += "</table>";
   return pg;
 }
-
 void handleHome() {
   if (!isAuthenticated()) {
     server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
@@ -1144,6 +835,9 @@ void handleHome() {
           }
           .logout {
               background-color: #f44336;
+              position: absolute;
+              top: 10px;
+              right: 10px;
           }
           .logout:hover, .logout:focus {
               background-color: #e3342f;
@@ -1153,11 +847,11 @@ void handleHome() {
               max-width: 800px;
               width: 100%;
           }
-          @media (max-width: 600px) {
-              .button {
-                  width: 120px;
-                  font-size: 14px;
-              }
+          .center-buttons {
+              display: flex;
+              justify-content: center;
+              gap: 10px;
+              margin-bottom: 20px;
           }
           table {
               width: 100%;
@@ -1181,20 +875,79 @@ void handleHome() {
               color: #fff;
               padding: 10px 20px;
               border-radius: 4px;
-              background-color: #28a745;
+              background-color: #007bff;
           }
           .refresh-button:hover {
-              background-color: #218838;
+              background-color: #0056b3;
           }
-      </style>
+        </style>
+        <script>
+      function showOptions(employeeID) {
+          let options = confirm('Choose an option:\nOK: End Shift (eight hours)\nCancel: Mark Out (current time)');
+          if (options) {
+              endShift(employeeID);
+          } else {
+              markOut(employeeID);
+          }
+      }
+
+      function endShift(employeeID) {
+          fetch('/endShift', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ id: employeeID })
+          }).then(response => response.text())
+            .then(data => {
+                alert(data);
+                location.reload();
+            });
+      }
+
+      function markOut(employeeID) {
+          let now = new Date();
+          
+          // Format the time as HH:MM (24-hour)
+          let hours = String(now.getHours()).padStart(2, '0');
+          let minutes = String(now.getMinutes()).padStart(2, '0');
+          let formattedTime = `${hours}:${minutes}`;
+
+          // Format the date as dd/mm/yyyy
+          let day = String(now.getDate()).padStart(2, '0');
+          let month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+          let year = now.getFullYear();
+          let formattedDate = `${day}/${month}/${year}`;
+
+          let data = {
+              id: employeeID,
+              out_date: formattedDate,
+              out_time: formattedTime
+          };
+
+          fetch('/markOut', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(data)
+          }).then(response => response.text())
+            .then(data => {
+                alert(data);
+                location.reload();
+            });
+      }
+  </script>
   </head>
   <body>
       <h1>Biometric Attendance Device</h1>
       <div class='container'>
-          <a class='button' href='/ConfigureDevice'>Configure Device</a>
-          <a class='button' href='/EnrollUser'>Enroll User</a>
-          <a class='button' href='/DeleteUser'>Delete User</a>
-          <a class='button' href='/AdminAttendanceCtrl'>Admin Attendance Ctrl</a>
+          <div class='center-buttons'>
+              <a class='button' href='/ConfigureDevice'>Configure Device</a>
+              <a class='button' href='/EnrollUser'>Enroll User</a>
+              <a class='button' href='/DeleteUser'>Delete User</a>
+              <a class='button' href='/AdminAttendanceCtrl'>Admin Control</a>
+          </div>
           <a class='button logout' href='/Logout'>Logout</a>
           <h2>Currently MarkedIn Employees</h2>
   )rawliteral";
@@ -1219,7 +972,43 @@ void handleHome() {
 
   server.send(200, "text/html", page);
 }
+void handleMarkOut() {
+  if (server.hasArg("plain") == false) {
+    server.send(400, "text/plain", "Invalid Request");
+    return;
+  }
 
+  String body = server.arg("plain");
+  DynamicJsonDocument doc(1024);
+  deserializeJson(doc, body);
+  deserializeJson(doc, body);
+  String fingerID = doc["id"];
+  String outDate = doc["out_date"];  //dd/mm/yyyy
+  String outTime = doc["out_time"];  //hh:mm (24 hour)
+
+  // write function here
+
+
+  String response = "Marked out employee " + employeeID + " at " + time;
+  server.send(200, "text/plain", response);
+}
+
+void handleEndShift() {
+  if (server.hasArg("plain") == false) {
+    server.send(400, "text/plain", "Invalid Request");
+    return;
+  }
+
+  String body = server.arg("plain");
+  DynamicJsonDocument doc(256);
+  deserializeJson(doc, body);
+  String fingerid = doc["id"];  // it's finger id
+
+  // here
+
+  String response = "Ended shift for employee " + employeeID;
+  server.send(200, "text/plain", response);
+}
 
 void handleAdminAttendanceCtrl() {
   if (!isAuthenticated()) {
@@ -1228,286 +1017,333 @@ void handleAdminAttendanceCtrl() {
   }
 
   String page = R"rawliteral(
-    <!DOCTYPE html>
-    <html lang='en'>
-    <head>
-      <meta charset='UTF-8'>
-      <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Admin Attendance Control</title>
       <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 80%; max-width: 800px; margin: 20px auto; border: 1px solid #ccc; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; }
-        .form-group input, .form-group select { width: 100%; padding: 8px; box-sizing: border-box; }
-        .buttons { display: flex; justify-content: space-between; flex-wrap: wrap; }
-        .buttons button { padding: 10px 20px; border: none; cursor: pointer; margin: 5px; }
-        .buttons button.upload { background-color: #4CAF50; color: white; }
-        .buttons button.home { background-color: #007BFF; color: white; }
-        .message { display: none; background: #4CAF50; color: white; padding: 10px; margin-top: 20px; border-radius: 5px; text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        table, th, td { border: 1px solid black; }
-        th, td { padding: 8px; text-align: left; }
+          body {
+              font-family: Arial, sans-serif;
+              background-color: #f4f4f9;
+              margin: 0;
+              padding: 0;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              height: 100vh;
+              text-align: center;
+          }
+          h1 {
+              margin-bottom: 20px;
+              font-size: 24px;
+              color: #333;
+          }
+          .form-container {
+              width: 80%;
+              max-width: 600px;
+              padding: 20px;
+              background: white;
+              box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+              border-radius: 10px;
+          }
+          .form-group {
+              margin-bottom: 20px;
+          }
+          label {
+              display: block;
+              margin-bottom: 5px;
+              font-weight: bold;
+          }
+          select, input {
+              width: 100%;
+              padding: 10px;
+              border-radius: 5px;
+              border: 1px solid #ddd;
+          }
+          .form-actions {
+              display: flex;
+              justify-content: space-between;
+          }
+          .button {
+              padding: 10px 20px;
+              background-color: #4CAF50;
+              color: white;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+              text-decoration: none;
+          }
+          .button:hover {
+              background-color: #45a049;
+          }
+          .button.red {
+              background-color: #f44336;
+          }
+          .button.red:hover {
+              background-color: #e3342f;
+          }
       </style>
-    </head>
-    <body>
-      <div class='container'>
-        <h2>Admin Attendance Control</h2>
-        <div class='form-group'>
-          <label for='employee'>Select Employee:</label>
-          <select id='employee' name='employee'>
-            <!-- Dynamic Options -->
-          </select>
-        </div>
-        <div class='form-group'>
-          <label for='in-time'>In Time:</label>
-          <select id='in-time' name='in-time'>
-            <!-- Dynamic Options -->
-          </select>
-        </div>
-        <div class='buttons'>
-          <button type='button' onclick='endShift()' class='upload'>End Shift (8 hours)</button>
-          <button type='button' onclick='markOut()' class='upload'>Mark Out (Current Time)</button>
-          <button type='button' onclick='goHome()' class='home'>Home</button>
-        </div>
-        <div class='message' id='message'>Attendance marked successfully!</div>
+  </head>
+  <body>
+      <h1>Admin Attendance Control</h1>
+      <div class="form-container">
+          <div class="form-group">
+              <label for="employeeSelect">Select Employee</label>
+              <select id="employeeSelect">
+                  <!-- Options will be populated by JavaScript -->
+              </select>
+          </div>
+          <div class="form-group">
+              <label for="markOption">Select Option</label>
+              <select id="markOption" onchange="toggleOutTimeField()">
+                  <option value="markInOnly">Mark In Only</option>
+                  <option value="markBoth">Mark Both</option>
+              </select>
+          </div>
+          <div class="form-group">
+              <label for="inTimeOption">In Time</label>
+              <select id="inTimeOption" onchange="toggleManualInTime()">
+                  <option value="currentTime">Current Time</option>
+                  <option value="manualTime">Add Manually</option>
+              </select>
+              <div id="manualInTime" style="display: none;">
+                  <input type="datetime-local" id="manualInTimeInput">
+              </div>
+          </div>
+          <div class="form-group" id="outTimeField" style="display: none;">
+              <label for="outTimeOption">Out Time</label>
+              <select id="outTimeOption" onchange="toggleCustomOutTime()">
+                  <option value="markShift">Mark Shift (Eight Hours)</option>
+                  <option value="customTime">Custom Time (Hours)</option>
+              </select>
+              <div id="customOutTime" style="display: none;">
+                  <input type="number" id="customOutTimeInput" min="0" max="12">
+              </div>
+          </div>
+          <div class="form-actions">
+              <button class="button" onclick="markAttendance()">Mark Attendance</button>
+              <a class="button red" href="/Home">Back to Home</a>
+          </div>
       </div>
+
       <script>
-        function endShift() {
-          // Implement end shift logic
-          document.getElementById('message').style.display = 'block';
-        }
-        function markOut() {
-          // Implement mark out logic
-          document.getElementById('message').style.display = 'block';
-        }
-        function goHome() {
-          window.location.href = '/Home';
-        }
+          // Fetch employee data from the server
+          fetch('/getEmployeeList')
+              .then(response => response.json())
+              .then(data => {
+                  const employeeSelect = document.getElementById('employeeSelect');
+                  data.forEach(employee => {
+                      const option = document.createElement('option');
+                      option.value = employee.id;
+                      option.text = employee.name;
+                      employeeSelect.appendChild(option);
+                  });
+              });
+
+          function toggleOutTimeField() {
+              const markOption = document.getElementById('markOption').value;
+              const outTimeField = document.getElementById('outTimeField');
+              if (markOption === 'markBoth') {
+                  outTimeField.style.display = 'block';
+              } else {
+                  outTimeField.style.display = 'none';
+              }
+          }
+
+          function toggleManualInTime() {
+              const inTimeOption = document.getElementById('inTimeOption').value;
+              const manualInTime = document.getElementById('manualInTime');
+              if (inTimeOption === 'manualTime') {
+                  manualInTime.style.display = 'block';
+              } else {
+                  manualInTime.style.display = 'none';
+              }
+          }
+
+          function toggleCustomOutTime() {
+              const outTimeOption = document.getElementById('outTimeOption').value;
+              const customOutTime = document.getElementById('customOutTime');
+              if (outTimeOption === 'customTime') {
+                  customOutTime.style.display = 'block';
+              } else {
+                  customOutTime.style.display = 'none';
+              }
+          }
+
+          function markAttendance() {
+              const employeeID = document.getElementById('employeeSelect').value;
+              const markOption = document.getElementById('markOption').value;
+              const inTimeOption = document.getElementById('inTimeOption').value;
+              let inTime, inDate, outTime;
+
+              if (inTimeOption === 'currentTime') {
+                  let now = new Date();
+                  inTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                  inDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+              } else {
+                  const manualInTimeInput = document.getElementById('manualInTimeInput').value;
+                  if (!manualInTimeInput) {
+                      alert('Please select the manual in time.');
+                      return;
+                  }
+                  let manualDateTime = new Date(manualInTimeInput);
+                  inTime = `${String(manualDateTime.getHours()).padStart(2, '0')}:${String(manualDateTime.getMinutes()).padStart(2, '0')}`;
+                  inDate = `${String(manualDateTime.getDate()).padStart(2, '0')}/${String(manualDateTime.getMonth() + 1).padStart(2, '0')}/${manualDateTime.getFullYear()}`;
+              }
+
+              let data = {
+                  id: employeeID,
+                  in_date: inDate,
+                  in_time: inTime
+              };
+
+              if (markOption === 'markBoth') {
+                  const outTimeOption = document.getElementById('outTimeOption').value;
+                  if (outTimeOption === 'markShift') {
+                      let now = new Date();
+                      now.setHours(now.getHours() + 8);
+                      outTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                  } else {
+                      const customOutTimeInput = document.getElementById('customOutTimeInput').value;
+                      if (!customOutTimeInput) {
+                          alert('Please enter the custom out time in hours.');
+                          return;
+                      }
+                      let now = new Date();
+                      now.setHours(now.getHours() + parseInt(customOutTimeInput));
+                      outTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                  }
+                  data.out_time = outTime;
+              }
+
+              fetch('/markAttendance', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+              }).then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    location.reload();
+                });
+          }
       </script>
-    </body>
-    </html>
+  </body>
+  </html>
   )rawliteral";
-
-  // Generate the dynamic options for employees and in-time
-  String employees = "<option value='1'>Employee 1</option><option value='2'>Employee 2</option>";
-  String inTimes = "<option value='08:00'>08:00</option><option value='09:00'>09:00</option>";
-
-  page.replace("<!-- Dynamic Options -->", employees);
-  page.replace("<!-- Dynamic Options -->", inTimes);
 
   server.send(200, "text/html", page);
 }
 
-void showMarkOutOptions(String employeeID) {
-  // JavaScript function to show markout options
-  String script = "<script>";
-  script += "function showMarkOutOptions(employeeID) {";
-  script += "  document.getElementById('employee').value = employeeID;";
-  script += "  document.querySelector('.form-group').style.display = 'block';";
-  script += "}";
-  script += "</script>";
 
-  server.send(200, "application/javascript", script);
+// void handleMarkAttendance() {
+//   if (server.hasArg("plain") == false) {
+//     server.send(400, "text/plain", "Invalid Request");
+//     return;
+//   }
+
+//   String body = server.arg("plain");
+//   DynamicJsonDocument doc(1024);
+//   deserializeJson(doc, body);
+//   String employeeID = doc["id"];
+//   String inDate = doc["in_date"];
+//   String inTime = doc["in_time"];
+//   String outTime = doc.containsKey("out_time") ? doc["out_time"].as<String>() : "";
+
+//   // Process the attendance marking with the provided data
+//   // For example, save this information to a database or file
+
+//   String response = "Marked attendance for employee " + employeeID + " with In time " + inTime + " on " + inDate;
+//   if (outTime != "") {
+//     response += " and Out time " + outTime;
+//   }
+//   server.send(200, "text/plain", response);
+// }
+
+void handleMarkAttendance() {
+  if (server.hasArg("plain") == false) {
+    server.send(400, "text/plain", "Invalid Request");
+    return;
+  }
+
+  String body = server.arg("plain");
+  DynamicJsonDocument doc(1024);
+  DeserializationError error = deserializeJson(doc, body);
+
+  if (error) {
+    server.send(400, "text/plain", "Invalid JSON");
+    return;
+  }
+
+  int id = doc["id"];
+  String inDate = doc["in_date"];
+  String inTime = doc["in_time"];
+  String outTime = doc["out_time"];  // Optional
+
+
+
+
+  String logEntry = "ID: " + String(id) + ", In Date: " + inDate + ", In Time: " + inTime;
+  if (outTime != "") {
+    logEntry += ", Out Time: " + outTime;
+  }
+  Serial.println(logEntry);
+
+  server.send(200, "text/plain", "Attendance marked successfully");
 }
-
 //-------------------------------------------------------------------------
 
-
-// void handleAdminAttendanceCtrl() {
+// void handleGetEmployeeList() {
 //   if (!isAuthenticated()) {
 //     server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
 //     return;  // Exit function
 //   }
 
-//   String page = R"rawliteral(
-//     <!DOCTYPE html>
-//     <html lang='en'>
-//     <head>
-//       <meta charset='UTF-8'>
-//       <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-//       <title>Admin Attendance Control</title>
-//       <style>
-//         body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
-//         .container { width: 80%; max-width: 800px; margin: 20px auto; border: 1px solid #ccc; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-//         .form-group { margin-bottom: 15px; }
-//         .form-group label { display: block; margin-bottom: 5px; }
-//         .form-group input, .form-group select { width: 100%; padding: 8px; box-sizing: border-box; }
-//         .buttons { display: flex; justify-content: space-between; flex-wrap: wrap; }
-//         .buttons button { padding: 10px 20px; border: none; cursor: pointer; margin: 5px; }
-//         .buttons button.upload { background-color: #4CAF50; color: white; }
-//         .buttons button.home { background-color: #007BFF; color: white; }
-//         .message { display: none; background: #4CAF50; color: white; padding: 10px; margin-top: 20px; border-radius: 5px; text-align: center; }
-//         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-//         table, th, td { border: 1px solid black; }
-//         th, td { padding: 8px; text-align: left; }
-//       </style>
-//     </head>
-//     <body>
-//       <div class='container'>
-//         <h2>Admin Attendance Control</h2>
-//         <div class='form-group'>
-//           <label for='employee'>Select Employee:</label>
-//           <select id='employee' name='employee'>
-//             <!-- Dynamic Options -->
-//           </select>
-//         </div>
-//         <div class='form-group'>
-//           <label for='in-time'>In Time:</label>
-//           <select id='in-time-option' name='in-time-option' onchange='toggleInTimeInput(this.value)'>
-//             <option value='current'>Current Time</option>
-//             <option value='manual'>Enter Manually</option>
-//           </select>
-//           <div id='in-time-manual' style='display: none;'>
-//             <input type='text' id='in-time' name='in-time' placeholder='HH:MM'>
-//             <input type='text' id='in-date' name='in-date' placeholder='DD/MM/YYYY'>
-//           </div>
-//         </div>
-//         <div class='form-group'>
-//           <label for='out-time'>Out Time:</label>
-//           <select id='out-time-option' name='out-time-option' onchange='toggleOutTimeInput(this.value)'>
-//             <option value='shift'>Mark One Shift (8 hours)</option>
-//             <option value='manual'>Enter Hours</option>
-//           </select>
-//           <div id='out-time-manual' style='display: none;'>
-//             <input type='number' id='out-hours' name='out-hours' placeholder='Enter Hours (1-12)' min='1' max='12'>
-//           </div>
-//         </div>
-//         <div class='buttons'>
-//           <button class='upload' onclick='uploadAttendance()'>Upload Attendance</button>
-//           <button class='home' onclick='goHome()'>Back to Home</button>
-//         </div>
-//       </div>
-//       <div class='container'>
-//         <h3>Enrolled Users</h3>
-//         <!-- User Table -->
-//         )rawliteral";
-//   page += getPageStr();
-//   page += R"rawliteral(
-//       </div>
-//       <script>
-//         document.addEventListener("DOMContentLoaded", function() {
-//           populateEmployeeList();
-//         });
+//   String response = "[";
+//   for (int i = 1; i <= FINGERPRINT_CAPACITY; i++) {
+//     if (employeeList->returnName(SD, i) == "")
+//       continue;  // if empty continue
 
-//         function populateEmployeeList() {
-//           fetch('/get-employee-list')
-//             .then(response => response.json())
-//             .then(data => {
-//               const employeeSelect = document.getElementById('employee');
-//               data.forEach(employee => {
-//                 const option = document.createElement('option');
-//                 option.value = employee.id;
-//                 option.textContent = employee.name;
-//                 employeeSelect.appendChild(option);
-//               });
-//             })
-//             .catch(error => console.error('Error fetching employee list:', error));
-//         }
+//     if (response.length() > 1) {
+//       response += ",";
+//     }
 
-//         function toggleInTimeInput(value) {
-//           const inTimeManual = document.getElementById('in-time-manual');
-//           if (value === 'manual') {
-//             inTimeManual.style.display = 'block';
-//           } else {
-//             inTimeManual.style.display = 'none';
-//           }
-//         }
+//     response += "{\"id\":" + String(i) + ",";
+//     response += "\"name\":\"" + employeeList->returnName(SD, i) + "\"}";
+//   }
+//   response += "]";
 
-//         function toggleOutTimeInput(value) {
-//           const outTimeManual = document.getElementById('out-time-manual');
-//           if (value === 'manual') {
-//             outTimeManual.style.display = 'block';
-//           } else {
-//             outTimeManual.style.display = 'none';
-//           }
-//         }
-
-//         function uploadAttendance() {
-//           const employeeId = document.getElementById('employee').value;
-//           let inTime, inDate, outTimeOption, outHours;
-
-//           const inTimeOption = document.getElementById('in-time-option').value;
-//           if (inTimeOption === 'manual') {
-//             inTime = document.getElementById('in-time').value;
-//             inDate = document.getElementById('in-date').value;
-//           } else {
-//             const now = new Date();
-//             inTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-//             inDate = now.getDate().toString().padStart(2, '0') + '/' + (now.getMonth() + 1).toString().padStart(2, '0') + '/' + now.getFullYear();
-//           }
-
-//           outTimeOption = document.getElementById('out-time-option').value;
-//           if (outTimeOption === 'manual') {
-//             outHours = document.getElementById('out-hours').value;
-//           } else {
-//             outHours = 8;
-//           }
-
-//           const attendance = {
-//             employeeId,
-//             inTime,
-//             inDate,
-//             outHours
-//           };
-
-//           fetch('/upload-attendance', {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify(attendance),
-//           })
-//           .then(response => response.json())
-//           .then(data => {
-//             console.log('Success:', data);
-//             alert('Attendance uploaded successfully!');
-//           })
-//           .catch((error) => {
-//             console.error('Error:', error);
-//             alert('Failed to upload attendance.');
-//           });
-//         }
-
-//         function goHome() {
-//           window.location.href = '/Home';
-//         }
-//       </script>
-//     </body>
-//     </html>
-//   )rawliteral";
-  
-//   server.send(200, "text/html", page);
+//   server.send(200, "application/json", response);
 // }
 
 void handleGetEmployeeList() {
-  if (!isAuthenticated()) {
-    server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
-    return;  // Exit function
-  }
+  DynamicJsonDocument doc(1024);
+  JsonArray array = doc.to<JsonArray>();
 
-  String response = "[";
   for (int i = 1; i <= FINGERPRINT_CAPACITY; i++) {
-    if (employeeList->returnName(SD, i) == "")
+    String name = employeeList->returnName(SD, i);
+    if (name == "")
       continue;  // if empty continue
 
-    if (response.length() > 1) {
-      response += ",";
-    }
-
-    response += "{\"id\":" + String(i) + ",";
-    response += "\"name\":\"" + employeeList->returnName(SD, i) + "\"}";
+    JsonObject obj = array.createNestedObject();
+    obj["id"] = i;
+    obj["name"] = name;
   }
-  response += "]";
 
-  server.send(200, "application/json", response);
+  String jsonStr;
+  serializeJson(doc, jsonStr);
+  server.send(200, "application/json", jsonStr);
 }
-
 void handleUploadAttendance() {
   if (!isAuthenticated()) {
     server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
     return;  // Exit function
   }
 
-  if (server.hasArg("plain") == false) { 
+  if (server.hasArg("plain") == false) {
     server.send(400, "text/plain", "Body not received");
     return;
   }
@@ -1516,7 +1352,7 @@ void handleUploadAttendance() {
   DynamicJsonDocument doc(1024);
   deserializeJson(doc, body);
 
-  int employeeId = doc["employeeId"]; // it's fingerID
+  int employeeId = doc["employeeId"];  // it's fingerID
   String inTime = doc["inTime"];
   String inDate = doc["inDate"];
   int outHours = doc["outHours"];
@@ -2015,209 +1851,6 @@ void handleLogout() {
   server.send(200, "text/html", page);
 }
 //-------------------------------------------------------------------------
-/*
-void handleEnrollUser() {
-  if (!isAuthenticated()) {
-    server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
-    return;  // Exit function
-  }
-  uint8_t latestEmpID = OverallAttendance->getLatestID(SD);
-
-  String page = R"(
-  <!DOCTYPE html>
-  <html lang='en'>
-  <head>
-      <meta charset='UTF-8'>
-      <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-      <title>Enroll User</title>
-      <style>
-          body {
-              font-family: Arial, sans-serif;
-              background-color: #f4f4f9;
-              margin: 0;
-              padding: 20px;
-          }
-          h1 {
-              text-align: center;
-              color: #333;
-          }
-          .container {
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-              background-color: #fff;
-              border-radius: 8px;
-              box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          }
-          p {
-              text-align: center;
-              font-size: 1.2em;
-              color: #666;
-          }
-          form {
-              display: flex;
-              flex-direction: column;
-          }
-          label {
-              margin-bottom: 8px;
-              font-weight: bold;
-          }
-          input[type='text'] {
-              padding: 10px;
-              margin-bottom: 20px;
-              border: 1px solid #ccc;
-              border-radius: 4px;
-              font-size: 1em;
-          }
-          button {
-              padding: 10px;
-              background-color: #4CAF50;
-              color: white;
-              border: none;
-              border-radius: 4px;
-              cursor: pointer;
-              font-size: 1em;
-          }
-          button:hover {
-              background-color: #45a049;
-          }
-          .back-button {
-              display: block;
-              margin-top: 20px;
-              text-align: center;
-              text-decoration: none;
-              color: #fff;
-              background-color: #007BFF;
-              padding: 10px 20px;
-              border-radius: 4px;
-          }
-          .back-button:hover {
-              background-color: #0056b3;
-          }
-          .enroll-info {
-              text-align: center;
-              font-size: 1.2em;
-              color: #333;
-              margin-bottom: 20px;
-          }
-      </style>
-      <script>
-          function validateForm() {
-              const nameInput = document.getElementById('name').value;
-              if (nameInput.length > 20) {
-                  alert('Name should not exceed 20 characters.');
-                  return false;
-              }
-              return true;
-          }
-      </script>
-  </head>
-  <body>
-      <div class='container'>
-          <h1>Enroll New User</h1>
-          <p>Current number of fingerprints stored: )"
-                + String(finger.templateCount) + R"( / 127</p>
-          <form onsubmit='return validateForm()' action='/EnrollUser' method='POST'>
-              <label for='name'>Employee Name:</label>
-              <input type='text' id='name' name='name' maxlength='20' required>
-              <div class='enroll-info'>Enroll as TWB)"
-                + String(latestEmpID / 100) + String((latestEmpID % 100) / 10) + String(latestEmpID % 10) + R"(</div>
-              <button type='submit'>Scan Fingerprint</button>
-          </form>
-          <a href='/Home' class='back-button'>Back to Home</a>
-      </div>
-  </body>
-  </html>
-  )";
-
-  if (server.method() == HTTP_POST) {
-    String name = server.arg("name");
-
-
-
-    if (name.length() > 0) {
-      String page2 = R"rawliteral(
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Scanning Fingerprint</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          background-color: #f4f4f9;
-          margin: 0;
-          padding: 0;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          text-align: center;
-        }
-        .container {
-          background-color: #fff;
-          padding: 20px 40px;
-          border-radius: 10px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-          color: #333;
-          font-size: 1.5em;
-          margin-bottom: 20px;
-        }
-        p {
-          color: #666;
-          font-size: 1.2em;
-          margin-bottom: 20px;
-        }
-        a {
-          display: inline-block;
-          padding: 10px 20px;
-          background-color: #007BFF;
-          color: white;
-          text-decoration: none;
-          border-radius: 5px;
-          transition: background-color 0.3s;
-        }
-        a:hover {
-          background-color: #0056b3;
-        }
-      </style>
-    </head>
-    <body>
-      <div class='container'>
-        <h1>Scanning Fingerprint...</h1>
-        <p>Check display and follow instructions to enroll new finger.</p>
-        <a href='/Home'>Click here to return to home</a>
-      </div>
-    </body>
-    </html>
-    )rawliteral";
-
-      server.send(200, "text/html", page2);
-
-      long int now = millis();
-
-      uint8_t successCase = getFingerprintEnroll(latestEmpID);
-      while (successCase != 0 && (millis() - now) < 30000) {
-        successCase = getFingerprintEnroll(latestEmpID);
-      }
-      if (successCase == 0) {
-        Serial.println("SUCCESSSSSSSSSS");
-        OverallAttendance->increaseID(SD);
-        String empIDStr = String(latestEmpID / 100) + String((latestEmpID % 100) / 10) + String(latestEmpID % 10);
-
-        employeeList->addName(SD, latestEmpID, "TWB" + empIDStr, name);
-      }
-    } else {
-      server.send(200, "text/html",
-                  "<html><body><h1>Failed to enroll. Please ensure all fields "
-                  "are correctly filled. <a href='/Home'>Back to "
-                  "Home</a></h1></body></html>");
-    }
-  } else {
-    server.send(200, "text/html", page);
-  }
-}*/
 
 void handleEnrollUser() {
   if (!isAuthenticated()) {
@@ -2848,10 +2481,12 @@ void setupOTA() {
   server.on("/restart-device", HTTP_POST, handleRestartDevice);
   server.on("/create-new-sheet", HTTP_POST, handleCreateNewSheet);
   server.on("/get-wifi-list", HTTP_GET, handleGetWifiList);
-  server.on("/mark-all-out", HTTP_POST, handleMarkAllOut);
+  server.on("/markAttendance", HTTP_POST, handleMarkAttendance);  // manual
+  server.on("/getEmployeeList", HTTP_GET, handleGetEmployeeList);
   server.on("/AdminAttendanceCtrl", HTTP_GET, handleAdminAttendanceCtrl);
-  server.on("/get-employee-list", HTTP_GET, handleGetEmployeeList);
   server.on("/upload-attendance", HTTP_POST, handleUploadAttendance);
+  server.on("/markOut", HTTP_POST, handleMarkOut);
+  server.on("/endShift", HTTP_POST, handleEndShift);
   server.on("/Logout", handleLogout);
 
   server.begin();
