@@ -792,6 +792,7 @@ String dataSheetMembers(String data) {
   pg += "</table>";
   return pg;
 }
+
 void handleHome() {
   if (!isAuthenticated()) {
     server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
@@ -799,197 +800,188 @@ void handleHome() {
   }
 
   String page = R"rawliteral(
-    <!DOCTYPE html>
-    <html lang='en'>
-    <head>
-        <meta charset='UTF-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <title>Home</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f9;
-                margin: 0;
-                padding: 0;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                height: 100vh;
-                text-align: center;
-            }
-            h1 {
-                margin-bottom: 20px;
-                font-size: 24px;
-                color: #333;
-            }
-            .button {
-                display: inline-block;
-                width: 150px;
-                height: 40px;
-                margin: 10px 5px;
-                font-size: 16px;
-                text-align: center;
-                line-height: 40px;
-                background-color: #4CAF50;
-                color: white;
-                text-decoration: none;
-                border-radius: 10px;
-                transition: background-color 0.3s;
-            }
-            .button:hover, .button:focus {
-                background-color: #45a049;
-            }
-            .logout {
-                background-color: #f44336;
-                position: absolute;
-                top: 10px;
-                right: 10px;
-            }
-            .logout:hover, .logout:focus {
-                background-color: #e3342f;
-            }
-            .container {
-                padding: 20px;
-                max-width: 800px;
-                width: 100%;
-            }
-            .center-buttons {
-                display: flex;
-                justify-content: center;
-                gap: 10px;
-                margin-bottom: 20px;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-                font-size: 14px;
-            }
-            th, td {
-                padding: 8px;
-                border: 1px solid #ddd;
-                text-align: left;
-            }
-            th {
-                background-color: #f2f2f2;
-            }
-            .refresh-button {
-                display: inline-block;
-                margin-top: 20px;
-                text-align: center;
-                text-decoration: none;
-                color: #fff;
-                padding: 10px 20px;
-                border-radius: 4px;
-                background-color: #007bff;
-            }
-            .refresh-button:hover {
-                background-color: #0056b3;
-            }
-            #markOutOptions {
-                position: fixed;
-                top: 10%; /* Adjust position as needed */
-                left: 50%;
-                transform: translateX(-50%);
-                background-color: white;
-                padding: 20px;
-                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-                border-radius: 10px;
-                z-index: 1000;
-                text-align: center;
-                display: none;
-            }
-            .modal-backdrop {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 999;
-                display: none;
-            }
-            .end-shift {
-                background-color: #4CAF50;
-                color: white;
-                margin-bottom: 10px;
-            }
-            .mark-out {
-                background-color: yellow;
-                color: black;
-            }
+  <!DOCTYPE html>
+  <html lang='en'>
+  <head>
+      <meta charset='UTF-8'>
+      <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+      <title>Home</title>
+      <style>
+          body {
+              font-family: Arial, sans-serif;
+              background-color: #f4f4f9;
+              margin: 0;
+              padding: 0;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              height: 100vh;
+              text-align: center;
+          }
+          h1 {
+              margin-bottom: 20px;
+              font-size: 24px;
+              color: #333;
+          }
+          .button {
+              display: inline-block;
+              width: 150px;
+              height: 40px;
+              margin: 10px 5px;
+              font-size: 16px;
+              text-align: center;
+              line-height: 40px;
+              background-color: #4CAF50;
+              color: white;
+              text-decoration: none;
+              border-radius: 10px;
+              transition: background-color 0.3s;
+          }
+          .button:hover, .button:focus {
+              background-color: #45a049;
+          }
+          .logout {
+              background-color: #f44336;
+              position: absolute;
+              top: 10px;
+              right: 10px;
+          }
+          .logout:hover, .logout:focus {
+              background-color: #e3342f;
+          }
+          .container {
+              padding: 20px;
+              max-width: 800px;
+              width: 100%;
+          }
+          .center-buttons {
+              display: flex;
+              justify-content: center;
+              gap: 10px;
+              margin-bottom: 20px;
+          }
+          table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 20px;
+              font-size: 14px;
+          }
+          th, td {
+              padding: 8px;
+              border: 1px solid #ddd;
+              text-align: left;
+          }
+          th {
+              background-color: #f2f2f2;
+          }
+          .refresh-button {
+              display: inline-block;
+              margin-top: 20px;
+              text-align: center;
+              text-decoration: none;
+              color: #fff;
+              padding: 10px 20px;
+              border-radius: 4px;
+              background-color: #007bff;
+          }
+          .refresh-button:hover {
+              background-color: #0056b3;
+          }
+          #markOutOptions {
+              position: fixed;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              background-color: white;
+              padding: 20px;
+              box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+              border-radius: 10px;
+              z-index: 1000;
+              text-align: center;
+              display: none;
+          }
+          .modal-backdrop {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(0, 0, 0, 0.5);
+              z-index: 999;
+              display: none;
+          }
         </style>
         <script>
-            function showOptions(employeeID) {
-                window.currentEmployeeID = employeeID;
-                document.getElementById('markOutOptions').style.display = 'block';
-                document.getElementById('modalBackdrop').style.display = 'block';
-            }
+          function showOptions(employeeID) {
+              window.currentEmployeeID = employeeID;
+              document.getElementById('markOutOptions').style.display = 'block';
+              document.getElementById('modalBackdrop').style.display = 'block';
+          }
 
-            function hideOptions() {
-                document.getElementById('markOutOptions').style.display = 'none';
-                document.getElementById('modalBackdrop').style.display = 'none';
-            }
+          function hideOptions() {
+              document.getElementById('markOutOptions').style.display = 'none';
+              document.getElementById('modalBackdrop').style.display = 'none';
+          }
 
-            function endShift() {
-                let employeeID = window.currentEmployeeID;
-                fetch('/endShift', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ id: employeeID })
-                }).then(response => response.text())
-                  .then(data => {
-                      alert(data);
-                      location.reload();
-                  });
-                hideOptions();
-            }
+          function endShift() {
+              let employeeID = window.currentEmployeeID;
+              fetch('/endShift', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ id: employeeID })
+              }).then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    location.reload();
+                });
+              hideOptions();
+          }
 
-            function markOut() {
-                let employeeID = window.currentEmployeeID;
-                let now = new Date();
-                let hours = String(now.getHours()).padStart(2, '0');
-                let minutes = String(now.getMinutes()).padStart(2, '0');
-                let formattedTime = `${hours}:${minutes}`;
-                let day = String(now.getDate()).padStart(2, '0');
-                let month = String(now.getMonth() + 1).padStart(2, '0');
-                let year = now.getFullYear();
-                let formattedDate = `${year}/${month}/${day}`;
+          function markOut() {
+              let employeeID = window.currentEmployeeID;
+              let now = new Date();
+              let hours = String(now.getHours()).padStart(2, '0');
+              let minutes = String(now.getMinutes()).padStart(2, '0');
+              let formattedTime = `${hours}:${minutes}`;
+              let day = String(now.getDate()).padStart(2, '0');
+              let month = String(now.getMonth() + 1).padStart(2, '0');
+              let year = now.getFullYear();
+              let formattedDate = `${year}/${month}/${day}`;
 
-                let data = {
-                    id: employeeID,
-                    out_date: formattedDate,
-                    out_time: formattedTime
-                };
+              let data = {
+                  id: employeeID,
+                  out_date: formattedDate,
+                  out_time: formattedTime
+              };
 
-                fetch('/markOut', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                }).then(response => response.text())
-                  .then(data => {
-                      alert(data);
-                      location.reload();
-                  });
-                hideOptions();
-            }
+              fetch('/markOut', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+              }).then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    location.reload();
+                });
+              hideOptions();
+          }
         </script>
-    </head>
-    <body>
-        <h1>Biometric Attendance Device</h1>
-        <div class='container'>
-            <div class='center-buttons'>
-                <a class='button' href='/ConfigureDevice'>Configure Device</a>
-                <a class='button' href='/EnrollUser'>Enroll User</a>
-                <a class='button' href='/DeleteUser'>Delete User</a>
-                <a class='button' href='/AdminAttendanceCtrl'>Admin Control</a>
-            </div>
-            <a class='button logout' href='/Logout'>Logout</a>
-            <h2>Currently MarkedIn Employees</h2>
+  </head>
+  <body>
+      <h1>Biometric Attendance Device</h1>
+      <div class='container'>
+          <div class='center-buttons'>
+              <a class='button' href='/ConfigureDevice'>Configure Device</a>
+              <a class='button' href='/EnrollUser'>Enroll User</a>
+              <a class='button' href='/DeleteUser'>Delete User</a>
+              <a class='button' href='/AdminAttendanceCtrl'>Admin Control</a>
+          </div>
+          <a class='button logout' href='/Logout'>Logout</a>
+          <h2>Currently MarkedIn Employees</h2>
   )rawliteral";
 
   // Fetch and display the currently marked-in employees
@@ -1004,21 +996,19 @@ void handleHome() {
   }
   page += dataSheetMembers(data);
   page += R"rawliteral(
-            <a href='/Home' class='refresh-button'>Refresh</a>
-        </div>
-        <div id="markOutOptions">
-            <button class="button end-shift" onclick="endShift()">End Shift</button>
-            <p class="mark-out" onclick="markOut()">Mark Out at Current Time</p>
-        </div>
-        <div class="modal-backdrop" id="modalBackdrop" onclick="hideOptions()"></div>
-    </body>
-    </html>
+          <a href='/Home' class='refresh-button'>Refresh</a>
+      </div>
+      <div id="markOutOptions">
+          <button class="button" onclick="endShift()">End Shift</button>
+          <button class="button" onclick="markOut()">Mark Out</button>
+      </div>
+      <div class="modal-backdrop" id="modalBackdrop" onclick="hideOptions()"></div>
+  </body>
+  </html>
   )rawliteral";
 
   server.send(200, "text/html", page);
 }
-
-
 
 void handleMarkOut() {
 
