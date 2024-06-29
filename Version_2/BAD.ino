@@ -1335,12 +1335,13 @@ void handleAdminAttendanceCtrl() {
               const employeeID = document.getElementById('employeeSelect').value;
               const markOption = document.getElementById('markOption').value;
               const inTimeOption = document.getElementById('inTimeOption').value;
-              let inTime, inDate, outTime;
+              let inTime, inDate, outTimeHours;
+              outTimeHours = 0;
 
               if (inTimeOption === 'currentTime') {
                   let now = new Date();
                   inTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-                  inDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+                  inDate = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDay()).padStart(2, '0')}`;
               } else {
                   const manualInTimeInput = document.getElementById('manualInTimeInput').value;
                   let parts = manualInTimeInput.split(' ');
@@ -1367,16 +1368,12 @@ void handleAdminAttendanceCtrl() {
               if (markOption === 'markBoth') {
                   const outTimeOption = document.getElementById('outTimeOption').value;
                   if (outTimeOption === 'markShift') {
-                      let now = new Date();
-                      now.setHours(now.getHours() + 8);
-                      outTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                      outTimeHours = 8;
                   } else {
-                      const customOutTimeInput = document.getElementById('customOutTimeInput').value;
-                      let now = new Date();
-                      now.setHours(now.getHours() + parseInt(customOutTimeInput));
-                      outTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                    const outTimeInput = document.getElementById('outTimeInput').value;
+                      outTimeHours = parseInt(customOutTimeInput);
                   }
-                  data.out_time = outTime;
+                  data.out_hours = outTimeHours;
               }
 
               fetch('/markAttendance', {
@@ -1416,7 +1413,7 @@ void handleMarkAttendance() {
   int id = doc["id"];
   String inDate = doc["in_date"];
   String inTime = doc["in_time"];
-  String outTime = doc["out_time"];  // Optional
+  int outTime = doc["out_hours"];  // Optional
 
   String empID = "TWB" + String(id / 100) + String((id % 100) / 10) + String(id % 10);
   TotalAttendance tempObject(SD, empID, CompanyName);
@@ -1424,11 +1421,7 @@ void handleMarkAttendance() {
 
 
   String logEntry = "ID: " + String(id) + ", In Date: " + inDate + ", In Time: " + inTime;
-  if (outTime != "") {
-    logEntry += ", Out Time: " + outTime;
-
-    int hours = outTime.toInt();
-
+  if (outTime == 0) {
     char dateIN[11];
     char timeIN[6];
 
@@ -1437,72 +1430,13 @@ void handleMarkAttendance() {
 
     for (int j = 0; j < 5; j++) timeIN[j] = inTime[j];
     timeIN[5] = '\0';
+    TotalAttendance tempObject(SD, empID, CompanyName);
 
-    Serial.print("DateIN ");
-    Serial.println(dateIN);
-    Serial.print("timeIN ");
-    Serial.println(timeIN);
-
-    time_t shiftEnd = tempObject.addxHours(dateIN, timeIN, hours);
-
-    tmElements_t tm;
-    breakTime(shiftEnd, tm);
-
-    uint32_t yearOUT = tm.Year + 1970;
-    uint8_t monthOUT = tm.Month;
-    uint8_t dayOUT = tm.Day;
-    uint8_t hourOUT = tm.Hour;
-    uint8_t minuteOUT = tm.Minute;
-
-    Serial.println(String(yearOUT) + " " + String(monthOUT) + " " + String(dayOUT) + " " + String(hourOUT) + " " + String(minuteOUT));
-
-    char dateOUT[11];
-    char timeOUT[6];
-
-    dateOUT[4] = '/';
-    dateOUT[7] = '/';
-
-    timeOUT[2] = ':';
-
-    dateOUT[0] = '0' + yearOUT / 1000;
-    dateOUT[1] = '0' + (yearOUT % 1000) / 100;
-    dateOUT[2] = '0' + (yearOUT % 100) / 10;
-    dateOUT[3] = '0' + (yearOUT % 10);
-
-    dateOUT[5] = '0' + monthOUT / 10;
-    dateOUT[6] = '0' + monthOUT % 10;
-
-    dateOUT[8] = '0' + dayOUT / 10;
-    dateOUT[9] = '0' + dayOUT % 10;
-
-    dateOUT[10] = '\0';
-
-    Serial.print("DateIN ");
-    Serial.println(dateIN);
-    Serial.print("timeIN ");
-    Serial.println(timeIN);
-
-    timeOUT[0] = '0' + hourOUT / 10;
-    timeOUT[1] = '0' + hourOUT % 10;
-
-    timeOUT[3] = '0' + minuteOUT / 10;
-    timeOUT[4] = '0' + minuteOUT % 10;
-
-    timeOUT[5] = '\0';
-
-    Serial.print("DateIN ");
-    Serial.println(dateIN);
-    Serial.print("timeIN ");
-    Serial.println(timeIN);
-    Serial.print("dateOUT : ");
-    Serial.println(dateOUT);
-    Serial.print("TimeOUT ");
-    Serial.println(timeOUT);
-
-    tempObject.appendAttendance(SD, dateIN, timeIN, dateOUT, timeOUT, hours * 3600);
-    updateAttendance(id);
+    tempObject.newMarked(SD, dateIN, timeIN);
   } else {
-    int hours = 8;
+    logEntry += ", Out Time: " + String(outTime);
+
+    int hours = outTime;
 
     char dateIN[11];
     char timeIN[6];
@@ -1573,6 +1507,7 @@ void handleMarkAttendance() {
     Serial.println(dateOUT);
     Serial.print("TimeOUT ");
     Serial.println(timeOUT);
+    TotalAttendance tempObject(SD, empID, CompanyName);
 
     tempObject.appendAttendance(SD, dateIN, timeIN, dateOUT, timeOUT, hours * 3600);
     updateAttendance(id);
