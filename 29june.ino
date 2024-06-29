@@ -64,6 +64,8 @@ String dataSheetMembers(String data);
 void handleAdminAttendanceCtrl();
 void handleEndShift();
 void handleMarkAttendance();
+void handleGetEmployeeList();
+void handleUploadAttendance();
 
 
 
@@ -1323,29 +1325,6 @@ void handleMarkAttendance() {
 }
 
 //-------------------------------------------------------------------------
-
-void handleGetEmployeeList() {
-  if (!isAuthenticated()) {
-    server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
-    return;  // Exit function
-  }
-
-  String response = "[";
-  for (int i = 1; i <= FINGERPRINT_CAPACITY; i++) {
-    if (employeeList->returnName(SD, i) == "")
-      continue;  // if empty continue
-
-    if (response.length() > 1) {
-      response += ",";
-    }
-
-    response += "{\"id\":" + String(i) + ",";
-    response += "\"name\":\"" + employeeList->returnName(SD, i) + "\"}";
-  }
-  response += "]";
-
-  server.send(200, "application/json", response);
-}
 
 void handleGetEmployeeList() {
   DynamicJsonDocument doc(1024);
