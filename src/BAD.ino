@@ -19,7 +19,7 @@
 
 
 #define PROJECT_ID "biometric-attendance-device"
-#define CLIENT_EMAIL "bad-001@biometric-attendance-device.iam.gserviceaccount.com"
+#define CLIENT_EMAIL "bad-001@your-company-name-here.iam.gserviceaccount.com"
 
 #define SIZE_OF_DATA_ARRAY 68
 #define SDA_ID 6  // location for delimiters (",")
@@ -106,12 +106,12 @@ String companyidPath = "/companyid.txt";
 
 String sheetId;  // used once only
 
-const String DEFAULT_SSID = "ioT_weB";
-const String DEFAULT_PASSWORD = "12341234";
+const String DEFAULT_SSID = "nameyourwifi";
+const String DEFAULT_PASSWORD = "12345678";
 const String DEFAULT_WWWID = "admin";
 const String DEFAULT_WWWPASS = "esp32";
-const String DEFAULT_GSHEETURL = "1kjVsjo8GPZHqmcbIkiuYRqXgevBSdq4YZchCUihwx14";
-const String DEFAULT_USERMAIL = "maheshpareek2005@gmail.com";
+const String DEFAULT_GSHEETURL = "1kjV......ihwx14";
+const String DEFAULT_USERMAIL = "mail@mail.com";
 const int DEFAULT_COMPANYID = 25;
 
 String CompanyName = "Company" + String(DEFAULT_COMPANYID);
